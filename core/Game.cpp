@@ -140,23 +140,25 @@ namespace ng {
     }
 
     void Game::checkEnclosures() {
-        // E1 : vÃĐrification aprÃĻs chaque pose, pour les deux bases.
-        // PrioritÃĐ : d'abord la base du joueur courant (il vient de s'enfermer lui-mÃŠme),
-        // puis celle de l'adversaire (le joueur courant l'a peut-ÃŠtre enfermÃĐe).
-        Player order[2] = {current_, opponent(current_)};
-        for (Player p : order) {
-            if (rules::isEnclosed(board_, p)) {
-                if (rules::legalRelocations(board_, p).empty()) {
-                    // Aucune position lÃĐgale : le propriÃĐtaire perd (F4 / R44).
-                    finish(opponent(p));
-                    return;
-                }
-                relocating_ = p;
-                phase_ = Phase::RelocateBase;
-                return;
-            }
+    // E1 : vÃĐrification aprÃĻs chaque pose, pour les deux bases.
+    // Une base est "en difficultÃĐ" si elle est enfermÃĐe OU si elle n'est plus
+    // mutuellement accessible (R51 / H23).
+    Player order[2] = {current_, opponent(current_)};
+    for (Player p : order) {
+        bool mustMove = rules::isEnclosed(board_, p)
+                     || !rules::baseIsMutuallyReachable(board_, p);
+        if (!mustMove) continue;
+
+        if (rules::legalRelocations(board_, p).empty()) {
+            // Aucune position lÃĐgale : le propriÃĐtaire perd (F4 / R44).
+            finish(opponent(p));
+            return;
         }
+        relocating_ = p;
+        phase_ = Phase::RelocateBase;
+        return;
     }
+}
 
     void Game::afterPlacementChecks() {
         checkEnclosures();

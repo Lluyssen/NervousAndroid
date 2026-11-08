@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/lino/Desktop/Nervous/core
+CXX_INCLUDES = -I/home/lino/Desktop/NervousAndroid/core
 
 CXX_FLAGS = -std=gnu++17
 

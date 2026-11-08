@@ -1,6 +1,7 @@
 CMakeFiles/nervous_game.dir/src/main.cpp.o: \
- /home/lino/Desktop/Nervous/src/main.cpp /usr/include/stdc-predef.h \
- /home/lino/Desktop/Nervous/src/GameScreen.h \
+ /home/lino/Desktop/NervousAndroid/src/main.cpp \
+ /usr/include/stdc-predef.h \
+ /home/lino/Desktop/NervousAndroid/src/GameScreen.h \
  /usr/local/include/SDL3/SDL.h /usr/local/include/SDL3/SDL_stdinc.h \
  /usr/local/include/SDL3/SDL_platform_defines.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h /usr/include/string.h \
@@ -168,7 +169,7 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: \
  /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
  /usr/include/c++/13/bits/vector.tcc \
- /home/lino/Desktop/Nervous/src/../core/Game.h \
- /home/lino/Desktop/Nervous/src/../core/Board.h \
- /home/lino/Desktop/Nervous/src/../core/Types.h \
- /home/lino/Desktop/Nervous/src/../core/Rules.h
+ /home/lino/Desktop/NervousAndroid/src/../core/Game.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Board.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Types.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Rules.h

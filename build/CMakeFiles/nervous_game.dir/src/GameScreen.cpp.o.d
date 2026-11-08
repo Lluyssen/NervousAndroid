@@ -1,6 +1,7 @@
 CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: \
- /home/lino/Desktop/Nervous/src/GameScreen.cpp /usr/include/stdc-predef.h \
- /home/lino/Desktop/Nervous/src/GameScreen.h \
+ /home/lino/Desktop/NervousAndroid/src/GameScreen.cpp \
+ /usr/include/stdc-predef.h \
+ /home/lino/Desktop/NervousAndroid/src/GameScreen.h \
  /usr/local/include/SDL3/SDL.h /usr/local/include/SDL3/SDL_stdinc.h \
  /usr/local/include/SDL3/SDL_platform_defines.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h /usr/include/string.h \
@@ -168,14 +169,36 @@ CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: \
  /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
  /usr/include/c++/13/bits/vector.tcc \
- /home/lino/Desktop/Nervous/src/../core/Game.h \
- /home/lino/Desktop/Nervous/src/../core/Board.h \
- /home/lino/Desktop/Nervous/src/../core/Types.h \
- /home/lino/Desktop/Nervous/src/../core/Rules.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Game.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Board.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Types.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Rules.h \
  /usr/include/c++/13/algorithm /usr/include/c++/13/bits/stl_algo.h \
  /usr/include/c++/13/bits/algorithmfwd.h \
  /usr/include/c++/13/bits/stl_heap.h \
  /usr/include/c++/13/bits/uniform_int_dist.h \
  /usr/include/c++/13/bits/stl_tempbuf.h \
  /usr/include/c++/13/pstl/glue_algorithm_defs.h \
- /usr/include/c++/13/pstl/execution_defs.h
+ /usr/include/c++/13/pstl/execution_defs.h /usr/include/c++/13/cmath \
+ /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+ /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+ /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+ /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+ /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+ /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+ /usr/include/c++/13/bits/specfun.h /usr/include/c++/13/limits \
+ /usr/include/c++/13/tr1/gamma.tcc \
+ /usr/include/c++/13/tr1/special_function_util.h \
+ /usr/include/c++/13/tr1/bessel_function.tcc \
+ /usr/include/c++/13/tr1/beta_function.tcc \
+ /usr/include/c++/13/tr1/ell_integral.tcc \
+ /usr/include/c++/13/tr1/exp_integral.tcc \
+ /usr/include/c++/13/tr1/hypergeometric.tcc \
+ /usr/include/c++/13/tr1/legendre_function.tcc \
+ /usr/include/c++/13/tr1/modified_bessel_func.tcc \
+ /usr/include/c++/13/tr1/poly_hermite.tcc \
+ /usr/include/c++/13/tr1/poly_laguerre.tcc \
+ /usr/include/c++/13/tr1/riemann_zeta.tcc

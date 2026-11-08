@@ -20,6 +20,8 @@ namespace ng {
     std::vector<Pos>  legalCells_;      // liste brute renvoyÃĐe par Game
     std::vector<char> legalTlMask_;     // lookup O(1) : tl lÃĐgal ?
     std::vector<char> hintMask_;        // cases Ã  marquer visuellement
+
+    
     void rebuildCache();
 
         bool findLegalTl(Pos click, Pos* out) const;
@@ -40,9 +42,27 @@ namespace ng {
         SDL_Renderer* renderer_ = nullptr;
 
         int cellSize_ = 24;
-        int hudHeight_ = 70;
+        int hudHeight_ = 112;
         bool running_ = true;
         std::string message_;
+
+            // --- Interface moderne ---
+    int   maxHp_ = 1;                // PV max, lu Ã  l'init
+    float shownHp_[2] = {0.f, 0.f};  // PV affichÃĐs (animÃĐs)
+    Uint64 lastTicks_ = 0;
+    float  time_ = 0.f;              // temps cumulÃĐ pour les pulsations
+
+    float lostFlash_[2] = {0.f, 0.f};   // flash rouge au PV perdu
+    int   prevHp_[2]    = {-1, -1};     // PV vus Ã  la frame prÃĐcÃĐdente
+
+    void drawRoundedRect(float x, float y, float w, float h, float radius);
+    void drawText(float x, float y, const std::string& s, float scale);
+    void drawPlayerCard(Player pl, float x, float y, float w, float h);
+    void drawStatusBar(float w);
+    void drawGameOver();
+    void updateAnimations();
+    std::string playerName(Player pl) const;
+        void drawMessageToast();
     };
 
 }  // namespace ng

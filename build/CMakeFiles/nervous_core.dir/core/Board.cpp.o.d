@@ -1,7 +1,8 @@
 CMakeFiles/nervous_core.dir/core/Board.cpp.o: \
- /home/lino/Desktop/Nervous/core/Board.cpp /usr/include/stdc-predef.h \
- /home/lino/Desktop/Nervous/core/Board.h /usr/include/c++/13/vector \
- /usr/include/c++/13/bits/requires_hosted.h \
+ /home/lino/Desktop/NervousAndroid/core/Board.cpp \
+ /usr/include/stdc-predef.h \
+ /home/lino/Desktop/NervousAndroid/core/Board.h \
+ /usr/include/c++/13/vector /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -51,8 +52,8 @@ CMakeFiles/nervous_core.dir/core/Board.cpp.o: \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
  /usr/include/c++/13/bits/uses_allocator.h \
  /usr/include/c++/13/bits/uses_allocator_args.h /usr/include/c++/13/tuple \
- /home/lino/Desktop/Nervous/core/Types.h /usr/include/c++/13/string \
- /usr/include/c++/13/bits/stringfwd.h \
+ /home/lino/Desktop/NervousAndroid/core/Types.h \
+ /usr/include/c++/13/string /usr/include/c++/13/bits/stringfwd.h \
  /usr/include/c++/13/bits/char_traits.h \
  /usr/include/c++/13/bits/postypes.h /usr/include/c++/13/cwchar \
  /usr/include/wchar.h \

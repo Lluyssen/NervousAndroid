@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/lino/Desktop/Nervous
+CMAKE_SOURCE_DIR = /home/lino/Desktop/NervousAndroid
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/lino/Desktop/Nervous/build
+CMAKE_BINARY_DIR = /home/lino/Desktop/NervousAndroid/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/nervous_game.dir/depend.make
@@ -70,32 +70,32 @@ include CMakeFiles/nervous_game.dir/progress.make
 include CMakeFiles/nervous_game.dir/flags.make
 
 CMakeFiles/nervous_game.dir/src/main.cpp.o: CMakeFiles/nervous_game.dir/flags.make
-CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/Nervous/src/main.cpp
+CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/src/main.cpp
 CMakeFiles/nervous_game.dir/src/main.cpp.o: CMakeFiles/nervous_game.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/Nervous/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/nervous_game.dir/src/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_game.dir/src/main.cpp.o -MF CMakeFiles/nervous_game.dir/src/main.cpp.o.d -o CMakeFiles/nervous_game.dir/src/main.cpp.o -c /home/lino/Desktop/Nervous/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/nervous_game.dir/src/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_game.dir/src/main.cpp.o -MF CMakeFiles/nervous_game.dir/src/main.cpp.o.d -o CMakeFiles/nervous_game.dir/src/main.cpp.o -c /home/lino/Desktop/NervousAndroid/src/main.cpp
 
 CMakeFiles/nervous_game.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nervous_game.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/Nervous/src/main.cpp > CMakeFiles/nervous_game.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/NervousAndroid/src/main.cpp > CMakeFiles/nervous_game.dir/src/main.cpp.i
 
 CMakeFiles/nervous_game.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_game.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/Nervous/src/main.cpp -o CMakeFiles/nervous_game.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/src/main.cpp -o CMakeFiles/nervous_game.dir/src/main.cpp.s
 
 CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: CMakeFiles/nervous_game.dir/flags.make
-CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: /home/lino/Desktop/Nervous/src/GameScreen.cpp
+CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: /home/lino/Desktop/NervousAndroid/src/GameScreen.cpp
 CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: CMakeFiles/nervous_game.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/Nervous/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o -MF CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o.d -o CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o -c /home/lino/Desktop/Nervous/src/GameScreen.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o -MF CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o.d -o CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o -c /home/lino/Desktop/NervousAndroid/src/GameScreen.cpp
 
 CMakeFiles/nervous_game.dir/src/GameScreen.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nervous_game.dir/src/GameScreen.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/Nervous/src/GameScreen.cpp > CMakeFiles/nervous_game.dir/src/GameScreen.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/NervousAndroid/src/GameScreen.cpp > CMakeFiles/nervous_game.dir/src/GameScreen.cpp.i
 
 CMakeFiles/nervous_game.dir/src/GameScreen.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_game.dir/src/GameScreen.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/Nervous/src/GameScreen.cpp -o CMakeFiles/nervous_game.dir/src/GameScreen.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/src/GameScreen.cpp -o CMakeFiles/nervous_game.dir/src/GameScreen.cpp.s
 
 # Object files for target nervous_game
 nervous_game_OBJECTS = \
@@ -111,7 +111,7 @@ nervous_game: CMakeFiles/nervous_game.dir/build.make
 nervous_game: libnervous_core.a
 nervous_game: /usr/local/lib/libSDL3.so.0.5.0
 nervous_game: CMakeFiles/nervous_game.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lino/Desktop/Nervous/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable nervous_game"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable nervous_game"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/nervous_game.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -123,6 +123,6 @@ CMakeFiles/nervous_game.dir/clean:
 .PHONY : CMakeFiles/nervous_game.dir/clean
 
 CMakeFiles/nervous_game.dir/depend:
-	cd /home/lino/Desktop/Nervous/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/lino/Desktop/Nervous /home/lino/Desktop/Nervous /home/lino/Desktop/Nervous/build /home/lino/Desktop/Nervous/build /home/lino/Desktop/Nervous/build/CMakeFiles/nervous_game.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/lino/Desktop/NervousAndroid/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/lino/Desktop/NervousAndroid /home/lino/Desktop/NervousAndroid /home/lino/Desktop/NervousAndroid/build /home/lino/Desktop/NervousAndroid/build /home/lino/Desktop/NervousAndroid/build/CMakeFiles/nervous_game.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/nervous_game.dir/depend
 

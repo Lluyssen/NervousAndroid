@@ -8,9 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/lino/Desktop/Nervous/core/Board.cpp" "CMakeFiles/nervous_core.dir/core/Board.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Board.cpp.o.d"
-  "/home/lino/Desktop/Nervous/core/Game.cpp" "CMakeFiles/nervous_core.dir/core/Game.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Game.cpp.o.d"
-  "/home/lino/Desktop/Nervous/core/Rules.cpp" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/core/Board.cpp" "CMakeFiles/nervous_core.dir/core/Board.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Board.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/core/Game.cpp" "CMakeFiles/nervous_core.dir/core/Game.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Game.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/core/Rules.cpp" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/lino/Desktop/Nervous/tests/test_rules.cpp" "CMakeFiles/test_rules.dir/tests/test_rules.cpp.o" "gcc" "CMakeFiles/test_rules.dir/tests/test_rules.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/tests/test_rules.cpp" "CMakeFiles/test_rules.dir/tests/test_rules.cpp.o" "gcc" "CMakeFiles/test_rules.dir/tests/test_rules.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

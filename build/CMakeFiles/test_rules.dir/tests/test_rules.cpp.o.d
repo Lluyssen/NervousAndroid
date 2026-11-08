@@ -1,5 +1,5 @@
 CMakeFiles/test_rules.dir/tests/test_rules.cpp.o: \
- /home/lino/Desktop/Nervous/tests/test_rules.cpp \
+ /home/lino/Desktop/NervousAndroid/tests/test_rules.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/13/cstdio \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -151,11 +151,11 @@ CMakeFiles/test_rules.dir/tests/test_rules.cpp.o: \
  /usr/include/c++/13/bits/basic_ios.tcc \
  /usr/include/c++/13/bits/ostream.tcc /usr/include/c++/13/istream \
  /usr/include/c++/13/bits/istream.tcc \
- /home/lino/Desktop/Nervous/core/Game.h /usr/include/c++/13/vector \
+ /home/lino/Desktop/NervousAndroid/core/Game.h /usr/include/c++/13/vector \
  /usr/include/c++/13/bits/stl_uninitialized.h \
  /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
  /usr/include/c++/13/bits/vector.tcc \
- /home/lino/Desktop/Nervous/core/Board.h \
- /home/lino/Desktop/Nervous/core/Types.h \
- /home/lino/Desktop/Nervous/core/Rules.h
+ /home/lino/Desktop/NervousAndroid/core/Board.h \
+ /home/lino/Desktop/NervousAndroid/core/Types.h \
+ /home/lino/Desktop/NervousAndroid/core/Rules.h

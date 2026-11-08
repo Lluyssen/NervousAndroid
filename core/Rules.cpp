@@ -253,7 +253,7 @@ namespace ng {
 bool baseIsMutuallyReachable(const Board& b, Player p) {
     Pos other;
     if (!findBase(b, opponent(p), &other)) return true;
-    return floodReaches(b, opponent(p), p) && floodReaches(b, p, opponent(p));
+    return isBaseAccessible(b, p) && isBaseAccessible(b, opponent(p));
 }
 
     }  // namespace rules
