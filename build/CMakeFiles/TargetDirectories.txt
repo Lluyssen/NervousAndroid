@@ -1,0 +1,6 @@
+/home/lino/Desktop/Nervous/build/CMakeFiles/nervous_core.dir
+/home/lino/Desktop/Nervous/build/CMakeFiles/test_rules.dir
+/home/lino/Desktop/Nervous/build/CMakeFiles/nervous_game.dir
+/home/lino/Desktop/Nervous/build/CMakeFiles/test.dir
+/home/lino/Desktop/Nervous/build/CMakeFiles/edit_cache.dir
+/home/lino/Desktop/Nervous/build/CMakeFiles/rebuild_cache.dir
