@@ -1,8 +1,10 @@
 #include "GameScreen.h"
+#include "Rules.h"
 #include <algorithm>
 #include <cmath>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 namespace ng {
 
@@ -43,8 +45,7 @@ GameScreen::GameScreen(int width, int height) : game_(width, height) {}
 
 GameScreen::~GameScreen() {
     if (renderer_) SDL_DestroyRenderer(renderer_);
-    if (window_) SDL_DestroyWindow(window_);
-    SDL_Quit();
+    if (window_)   SDL_DestroyWindow(window_);
 }
 
 bool GameScreen::init() {
@@ -71,14 +72,62 @@ bool GameScreen::init() {
     prevHp_[1] = game_.hp(Player::Two);
     lastTicks_ = SDL_GetTicks();
 
+    SDL_RaiseWindow(window_);
+SDL_PumpEvents();
+SDL_FlushEvents(SDL_EVENT_FIRST, SDL_EVENT_LAST);
+startTicks_ = SDL_GetTicks();  
+
     setMessage("J1 : placez votre base.");
     return true;
+}
+
+void GameScreen::playComputerTurn() {
+    static Uint64 nextMove = 0;
+    if (SDL_GetTicks() < nextMove) return;      // petit dÃĐlai pour voir le coup
+    nextMove = SDL_GetTicks() + 350;
+
+    Result r = Result::WrongPhase;
+    switch (game_.phase()) {
+        case Phase::PlaceBaseP2: {
+            auto cells = game_.legalInitialBasePlacements();
+            if (!cells.empty()) r = game_.placeBase(cells[rand() % cells.size()]);
+            break;
+        }
+        case Phase::RelocateBase: {
+            auto cells = game_.legalBaseRelocations();
+            if (!cells.empty()) r = game_.relocateBase(cells[rand() % cells.size()]);
+            break;
+        }
+        case Phase::PlaySquares: {
+            auto cells = game_.legalSquarePlacements();
+            if (cells.empty()) { r = game_.endTurn(); break; }
+            // Heuristique : la pose la plus proche de la base adverse.
+            Pos target;
+            if (!rules::findBase(game_.board(), Player::One, &target)) target = cells[0];
+            Pos best = cells[0];
+            int bestD = 1 << 30;
+            for (const Pos& c : cells) {
+                int d = std::abs(c.x - target.x) + std::abs(c.y - target.y);
+                if (d < bestD) { bestD = d; best = c; }
+            }
+            r = game_.placeSquare(best);
+            break;
+        }
+        default: return;
+    }
+    setMessage(describe(r));
+    dirty_ = true;
 }
 
 void GameScreen::run() {
     while (running_) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) handleEvent(e);
+
+        if (mode_ == GameMode::VsComputer && !game_.isOver() &&
+            game_.current() == Player::Two)
+            playComputerTurn();
+
         updateAnimations();
         render();
         SDL_Delay(16);
@@ -178,6 +227,8 @@ bool GameScreen::findLegalTl(Pos click, Pos* out) const {
 }
 
 void GameScreen::handleClick(float mx, float my) {
+    if (SDL_GetTicks() - startTicks_ < 250) return;
+    if (mode_ == GameMode::VsComputer && game_.current() == Player::Two) return;
     if (game_.isOver()) return;
     Pos p;
     if (!pixelToCell(mx, my, &p)) return;
@@ -515,29 +566,35 @@ void GameScreen::drawGameOver() {
     const float w = static_cast<float>(winW), h = static_cast<float>(winH);
 
     // Voile sombre.
-    setColor(renderer_, Color{8, 9, 14, 190});
+    setColor(renderer_, Color{8, 9, 14, 200});
     SDL_FRect veil{0, 0, w, h};
     SDL_RenderFillRect(renderer_, &veil);
 
-    Player win = game_.winner();
-    Color col = playerColor(win);
+    const Player win = game_.winner();
+    const Color col = playerColor(win);
 
-    float cw = std::min(w - 40, 420.f), ch = 150.f;
-    float cx = (w - cw) / 2.f, cy = (h - ch) / 2.f;
+    const float cw = std::min(w - 40.f, 460.f), ch = 190.f;
+    const float cx = (w - cw) / 2.f, cy = (h - ch) / 2.f;
 
-    setColor(renderer_, withAlpha(col, 70));
-    drawRoundedRect(cx - 4, cy - 4, cw + 8, ch + 8, 20.f);
+    // Halo pulsant + carte.
+    float pulse = 0.6f + 0.4f * std::sin(time_ * 3.f);
+    setColor(renderer_, withAlpha(col, static_cast<Uint8>(50 + 60 * pulse)));
+    drawRoundedRect(cx - 6, cy - 6, cw + 12, ch + 12, 22.f);
     setColor(renderer_, kPanel);
     drawRoundedRect(cx, cy, cw, ch, 16.f);
     setColor(renderer_, col);
     drawRoundedRect(cx, cy, cw, 8.f, 4.f);
 
-    setColor(renderer_, kTextDim);
-    drawText(cx + 24, cy + 28, "VICTOIRE", 2.0f);
-    setColor(renderer_, col);
-    drawText(cx + 24, cy + 58, playerName(win), 3.0f);
-    setColor(renderer_, kTextDim);
-    drawText(cx + 24, cy + 108, "Echap : quitter", 1.5f);
+    // Textes centrÃĐs : 8 px par caractÃĻre Ã  l'ÃĐchelle 1.
+    auto centered = [&](const std::string& s, float scale, float y, Color c) {
+        float tw = static_cast<float>(s.size()) * 8.f * scale;
+        setColor(renderer_, c);
+        drawText(cx + (cw - tw) * 0.5f, y, s, scale);
+    };
+
+    centered("VICTOIRE", 2.0f, cy + 34, kTextDim);
+    centered(playerName(win) + " a gagne !", 3.0f, cy + 74, col);
+    centered("Echap : quitter", 1.5f, cy + ch - 36, kTextDim);
 }
 
 void GameScreen::drawMessageToast() {

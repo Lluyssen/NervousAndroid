@@ -261,6 +261,30 @@ src/GameScreen.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen.cpp.s
 .PHONY : src/GameScreen.cpp.s
 
+src/MenuScreen.o: src/MenuScreen.cpp.o
+.PHONY : src/MenuScreen.o
+
+# target to build an object file
+src/MenuScreen.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.o
+.PHONY : src/MenuScreen.cpp.o
+
+src/MenuScreen.i: src/MenuScreen.cpp.i
+.PHONY : src/MenuScreen.i
+
+# target to preprocess a source file
+src/MenuScreen.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.i
+.PHONY : src/MenuScreen.cpp.i
+
+src/MenuScreen.s: src/MenuScreen.cpp.s
+.PHONY : src/MenuScreen.s
+
+# target to generate assembly for a file
+src/MenuScreen.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.s
+.PHONY : src/MenuScreen.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -333,6 +357,9 @@ help:
 	@echo "... src/GameScreen.o"
 	@echo "... src/GameScreen.i"
 	@echo "... src/GameScreen.s"
+	@echo "... src/MenuScreen.o"
+	@echo "... src/MenuScreen.i"
+	@echo "... src/MenuScreen.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

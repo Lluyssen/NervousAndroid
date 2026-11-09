@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o"
   "CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o.d"
+  "CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.o"
+  "CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.o.d"
   "CMakeFiles/nervous_game.dir/src/main.cpp.o"
   "CMakeFiles/nervous_game.dir/src/main.cpp.o.d"
   "nervous_game"

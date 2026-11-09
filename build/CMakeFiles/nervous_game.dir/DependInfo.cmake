@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lino/Desktop/NervousAndroid/src/GameScreen.cpp" "CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o" "gcc" "CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/src/MenuScreen.cpp" "CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.o" "gcc" "CMakeFiles/nervous_game.dir/src/MenuScreen.cpp.o.d"
   "/home/lino/Desktop/NervousAndroid/src/main.cpp" "CMakeFiles/nervous_game.dir/src/main.cpp.o" "gcc" "CMakeFiles/nervous_game.dir/src/main.cpp.o.d"
   )
 

@@ -173,6 +173,7 @@ CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: \
  /home/lino/Desktop/NervousAndroid/src/../core/Board.h \
  /home/lino/Desktop/NervousAndroid/src/../core/Types.h \
  /home/lino/Desktop/NervousAndroid/src/../core/Rules.h \
+ /home/lino/Desktop/NervousAndroid/src/MenuScreen.h \
  /usr/include/c++/13/algorithm /usr/include/c++/13/bits/stl_algo.h \
  /usr/include/c++/13/bits/algorithmfwd.h \
  /usr/include/c++/13/bits/stl_heap.h \

@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "../core/Game.h"
+#include "MenuScreen.h"
 
 namespace ng {
 
@@ -13,6 +14,7 @@ namespace ng {
 
         bool init();
         void run();
+        void setMode(GameMode m) { mode_ = m; }
 
     private:
 
@@ -20,6 +22,11 @@ namespace ng {
     std::vector<Pos>  legalCells_;      // liste brute renvoyÃĐe par Game
     std::vector<char> legalTlMask_;     // lookup O(1) : tl lÃĐgal ?
     std::vector<char> hintMask_;        // cases Ã  marquer visuellement
+
+    GameMode mode_ = GameMode::LocalOneVsOne;
+    Uint64 startTicks_ = 0;
+    
+    void playComputerTurn();
 
     
     void rebuildCache();
