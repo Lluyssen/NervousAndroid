@@ -21,16 +21,22 @@ public:
     GameMode run();
 
 private:
-    static constexpr int kButtonCount = 4;
+    static constexpr int kButtonCount = 4;   // taille max du tableau
 
     struct Button {
-        float x, y, w, h;
+        float x = 0, y = 0, w = 0, h = 0;
         std::string label;
         std::string sub;
-        GameMode mode;
+        GameMode mode = GameMode::None;
+        bool opensSubmenu = false;           // vrai pour le bouton "Ordinateur"
     };
 
-    void layout();
+    enum class Page { Main, Computer };
+    Page page_        = Page::Main;
+    int  buttonCount_ = 3;                   // nombre de boutons de la page courante
+
+    void showPage(Page p);                   // remplace layout()
+    void activate(int i);                    // clic / Entree sur un bouton
     int  buttonAt(float mx, float my) const;
     void handleEvent(const SDL_Event& e);
     void render();

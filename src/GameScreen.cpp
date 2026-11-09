@@ -61,7 +61,7 @@ bool GameScreen::init() {
     const int w = std::max(b.width() * cellSize_, 560);
     const int h = b.height() * cellSize_ + static_cast<int>(kHudHeight);
 
-    if (!SDL_CreateWindowAndRenderer("Jeu de carres", w, h, 0, &window_, &renderer_)) {
+    if (!SDL_CreateWindowAndRenderer("NervousGAME", w, h, 0, &window_, &renderer_)) {
         SDL_Log("CreateWindow: %s", SDL_GetError());
         return false;
     }

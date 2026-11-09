@@ -32,30 +32,65 @@ bool MenuScreen::init() {
         return false;
     }
     SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
-    layout();
+    showPage(Page::Main);
     lastTicks_ = SDL_GetTicks();
     return true;
 }
 
-void MenuScreen::layout() {
+void MenuScreen::showPage(Page p) {
+    page_ = p;
+    selected_ = 0;
+    hover_ = -1;
+
     const float bw = 400.f, bh = 78.f, gap = 18.f;
     const float x = (kWinW - bw) / 2.f;
     float y = 190.f;
-    buttons_[0] = {x, y, bw, bh, "Ordinateur simple", "IA facile",                GameMode::VsComputerEasy};
-    y += bh + gap;
-    buttons_[1] = {x, y, bw, bh, "Ordinateur expert", "IA qui anticipe",          GameMode::VsComputerHard};
-    y += bh + gap;
-    buttons_[2] = {x, y, bw, bh, "1 contre 1",        "Deux joueurs, meme ecran", GameMode::LocalOneVsOne};
-    y += bh + gap;
-    buttons_[3] = {x, y, bw, bh, "Multijoueur",       "Jouer en reseau",          GameMode::Multiplayer};
+
+    if (p == Page::Main) {
+        buttons_[0] = {x, y, bw, bh, "Ordinateur", "Jouer contre l'IA",
+                       GameMode::None, true};
+        y += bh + gap;
+        buttons_[1] = {x, y, bw, bh, "1 contre 1", "Deux joueurs, meme ecran",
+                       GameMode::LocalOneVsOne, false};
+        y += bh + gap;
+        buttons_[2] = {x, y, bw, bh, "Multijoueur", "Jouer en reseau",
+                       GameMode::Multiplayer, false};
+        buttonCount_ = 3;
+    } else {
+        buttons_[0] = {x, y, bw, bh, "Ordinateur simplet", "IA facile",
+                       GameMode::VsComputerEasy, false};
+        y += bh + gap;
+        buttons_[1] = {x, y, bw, bh, "Ordinateur expert", "IA qui anticipe",
+                       GameMode::VsComputerHard, false};
+        y += bh + gap + 10.f;
+        // Bouton retour : plus petit, centre.
+        const float rw = 200.f, rh = 50.f;
+        buttons_[2] = {(kWinW - rw) / 2.f, y, rw, rh, "< Retour", "",
+                       GameMode::None, false};
+        buttonCount_ = 3;
+    }
 }
 
 int MenuScreen::buttonAt(float mx, float my) const {
-    for (int i = 0; i < kButtonCount; ++i) {
+    for (int i = 0; i < buttonCount_; ++i) {
         const Button& b = buttons_[i];
         if (mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h) return i;
     }
     return -1;
+}
+
+void MenuScreen::activate(int i) {
+    if (i < 0 || i >= buttonCount_) return;
+    const Button& b = buttons_[i];
+
+    if (b.opensSubmenu) {
+        showPage(Page::Computer);
+    } else if (b.mode == GameMode::None) {
+        showPage(Page::Main);          // bouton Retour
+    } else {
+        choice_ = b.mode;
+        running_ = false;
+    }
 }
 
 void MenuScreen::handleEvent(const SDL_Event& e) {
@@ -70,21 +105,20 @@ void MenuScreen::handleEvent(const SDL_Event& e) {
             break;
         }
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            if (e.button.button == SDL_BUTTON_LEFT) {
-                int h = buttonAt(e.button.x, e.button.y);
-                if (h >= 0) { choice_ = buttons_[h].mode; running_ = false; }
-            }
+            if (e.button.button == SDL_BUTTON_LEFT)
+                activate(buttonAt(e.button.x, e.button.y));
             break;
         case SDL_EVENT_KEY_DOWN:
-            if (e.key.key == SDLK_ESCAPE) running_ = false;
-            else if (e.key.key == SDLK_UP)
-                selected_ = (selected_ + kButtonCount - 1) % kButtonCount;
-            else if (e.key.key == SDLK_DOWN)
-                selected_ = (selected_ + 1) % kButtonCount;
-            else if (e.key.key == SDLK_RETURN || e.key.key == SDLK_SPACE) {
-                choice_ = buttons_[selected_].mode;
-                running_ = false;
+            if (e.key.key == SDLK_ESCAPE) {
+                if (page_ == Page::Computer) showPage(Page::Main);
+                else running_ = false;
             }
+            else if (e.key.key == SDLK_UP)
+                selected_ = (selected_ + buttonCount_ - 1) % buttonCount_;
+            else if (e.key.key == SDLK_DOWN)
+                selected_ = (selected_ + 1) % buttonCount_;
+            else if (e.key.key == SDLK_RETURN || e.key.key == SDLK_SPACE)
+                activate(selected_);
             break;
         default: break;
     }
@@ -133,17 +167,24 @@ void MenuScreen::render() {
     setColor(renderer_, withAlpha(kP2, static_cast<Uint8>(255 * pulse)));
     drawRoundedRect(kWinW / 2.f + 6, 52, 28, 28, 7.f);
 
-    centered("JEU DE CARRES", 3.0f, 100, kText);
-    centered("Choisissez un mode de jeu", 1.5f, 148, kTextDim);
+    centered("NervousGAME", 3.0f, 100, kText);
+    centered(page_ == Page::Main ? "Choisissez un mode de jeu"
+                                 : "Choisissez la difficulte",
+             1.5f, 148, kTextDim);
 
-    for (int i = 0; i < kButtonCount; ++i) {
+     for (int i = 0; i < buttonCount_; ++i) {
         const Button& b = buttons_[i];
         const bool sel = (i == selected_);
-        // Bleu pour les modes contre l'IA, rouge pour les modes a deux.
-        const Color accent = (i >= 2) ? kP2 : kP1;
+        const bool isBack = (b.mode == GameMode::None && !b.opensSubmenu);
+
+        // Bleu : modes contre l'IA, rouge : modes a deux, gris : retour.
+        const bool vsAi = b.opensSubmenu ||
+                          b.mode == GameMode::VsComputerEasy ||
+                          b.mode == GameMode::VsComputerHard;
+        const Color accent = isBack ? kTextDim : (vsAi ? kP1 : kP2);
 
         setColor(renderer_, sel ? kPanelHi : kPanel);
-        drawRoundedRect(b.x, b.y, b.w, b.h, 14.f);
+        drawRoundedRect(b.x, b.y, b.w, b.h, isBack ? 12.f : 14.f);
 
         setColor(renderer_, sel ? accent : withAlpha(accent, 110));
         drawRoundedRect(b.x, b.y, 7.f, b.h, 3.f);
@@ -153,13 +194,31 @@ void MenuScreen::render() {
             SDL_RenderRect(renderer_, &o);
         }
 
-        setColor(renderer_, kText);
-        drawText(b.x + 28, b.y + 18, b.label, 2.0f);
-        setColor(renderer_, kTextDim);
-        drawText(b.x + 28, b.y + 48, b.sub, 1.5f);
+        if (isBack) {
+            // Texte centre (8 px de large par caractere, 8 px de haut, echelle 2).
+            const float scale = 2.0f;
+            const float tw = static_cast<float>(b.label.size()) * 8.f * scale;
+            setColor(renderer_, sel ? kText : kTextDim);
+            drawText(b.x + (b.w - tw) * 0.5f + 3.f,
+                     b.y + (b.h - 8.f * scale) * 0.5f,
+                     b.label, scale);
+        } else {
+            setColor(renderer_, kText);
+            drawText(b.x + 28, b.y + 18, b.label, 2.0f);
+            setColor(renderer_, kTextDim);
+            drawText(b.x + 28, b.y + 48, b.sub, 1.5f);
+        }
+
+        // Petite fleche sur le bouton qui ouvre le sous-menu.
+        if (b.opensSubmenu) {
+            setColor(renderer_, sel ? kText : kTextDim);
+            drawText(b.x + b.w - 40, b.y + 26, ">", 3.0f);
+        }
     }
 
-    centered("Haut/Bas : choisir   Entree : valider   Echap : quitter",
+    centered(page_ == Page::Main
+                 ? "Haut/Bas : choisir   Entree : valider   Echap : quitter"
+                 : "Haut/Bas : choisir   Entree : valider   Echap : retour",
              1.0f, kWinH - 28, kTextDim);
 
     SDL_RenderPresent(renderer_);
