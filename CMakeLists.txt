@@ -9,6 +9,7 @@ add_library(nervous_core
         core/Board.cpp
         core/Rules.cpp
         core/Game.cpp
+        core/MctsAi.cpp
 )
 target_include_directories(nervous_core PUBLIC core)
 target_compile_options(nervous_core PRIVATE -Wall -Wextra)

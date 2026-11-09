@@ -213,6 +213,30 @@ core/Game.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/core/Game.cpp.s
 .PHONY : core/Game.cpp.s
 
+core/MctsAi.o: core/MctsAi.cpp.o
+.PHONY : core/MctsAi.o
+
+# target to build an object file
+core/MctsAi.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o
+.PHONY : core/MctsAi.cpp.o
+
+core/MctsAi.i: core/MctsAi.cpp.i
+.PHONY : core/MctsAi.i
+
+# target to preprocess a source file
+core/MctsAi.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/core/MctsAi.cpp.i
+.PHONY : core/MctsAi.cpp.i
+
+core/MctsAi.s: core/MctsAi.cpp.s
+.PHONY : core/MctsAi.s
+
+# target to generate assembly for a file
+core/MctsAi.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s
+.PHONY : core/MctsAi.cpp.s
+
 core/Rules.o: core/Rules.cpp.o
 .PHONY : core/Rules.o
 
@@ -351,6 +375,9 @@ help:
 	@echo "... core/Game.o"
 	@echo "... core/Game.i"
 	@echo "... core/Game.s"
+	@echo "... core/MctsAi.o"
+	@echo "... core/MctsAi.i"
+	@echo "... core/MctsAi.s"
 	@echo "... core/Rules.o"
 	@echo "... core/Rules.i"
 	@echo "... core/Rules.s"

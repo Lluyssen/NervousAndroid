@@ -39,12 +39,10 @@ namespace ng {
         int damageForPlacement(const Board& b, Player p, Pos pos);
 
 // Vrai si la base du joueur "target" est accessible à l'adversaire (T4).
-        bool isBaseAccessible(const Board& b, Player target);
+        bool isBaseProtected(const Board& b, Player target);
 
-// Vrai si la base du joueur "target" est enfermée (inverse de isBaseAccessible).
-        inline bool isEnclosed(const Board& b, Player target) {
-            return !isBaseAccessible(b, target);
-        }
+// Vrai si la base du joueur "target" est enfermée (inverse de isBaseProtected).
+        bool isEnclosed(const Board& b, Player target);
 
 // Cherche le coin haut-gauche de la base du joueur p. Renvoie false si absente.
         bool findBase(const Board& b, Player p, Pos* topLeft);

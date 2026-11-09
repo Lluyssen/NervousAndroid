@@ -51,6 +51,11 @@ CMakeFiles/nervous_core.dir/core/Game.cpp.o: \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
  /usr/include/c++/13/bits/uses_allocator.h \
  /usr/include/c++/13/bits/uses_allocator_args.h /usr/include/c++/13/tuple \
+ /usr/include/c++/13/optional /usr/include/c++/13/exception \
+ /usr/include/c++/13/bits/exception_ptr.h \
+ /usr/include/c++/13/bits/cxxabi_init_exception.h \
+ /usr/include/c++/13/typeinfo /usr/include/c++/13/bits/nested_exception.h \
+ /usr/include/c++/13/bits/enable_special_members.h \
  /home/lino/Desktop/NervousAndroid/core/Board.h \
  /home/lino/Desktop/NervousAndroid/core/Types.h \
  /usr/include/c++/13/string /usr/include/c++/13/bits/stringfwd.h \
@@ -121,7 +126,4 @@ CMakeFiles/nervous_core.dir/core/Game.cpp.o: \
  /usr/include/c++/13/bits/charconv.h \
  /usr/include/c++/13/bits/basic_string.tcc \
  /home/lino/Desktop/NervousAndroid/core/Rules.h \
- /usr/include/c++/13/stdexcept /usr/include/c++/13/exception \
- /usr/include/c++/13/bits/exception_ptr.h \
- /usr/include/c++/13/bits/cxxabi_init_exception.h \
- /usr/include/c++/13/typeinfo /usr/include/c++/13/bits/nested_exception.h
+ /usr/include/c++/13/stdexcept

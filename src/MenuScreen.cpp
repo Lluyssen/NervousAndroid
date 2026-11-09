@@ -17,7 +17,7 @@ constexpr Color kP2      {255, 92, 108, 255};
 void setColor(SDL_Renderer* r, Color c) { SDL_SetRenderDrawColor(r, c.r, c.g, c.b, c.a); }
 Color withAlpha(Color c, Uint8 a) { return Color{c.r, c.g, c.b, a}; }
 
-constexpr int kWinW = 560, kWinH = 520;
+constexpr int kWinW = 560, kWinH = 620;
 }  // namespace
 
 MenuScreen::~MenuScreen() {
@@ -41,15 +41,17 @@ void MenuScreen::layout() {
     const float bw = 400.f, bh = 78.f, gap = 18.f;
     const float x = (kWinW - bw) / 2.f;
     float y = 190.f;
-    buttons_[0] = {x, y, bw, bh, "Contre l'ordinateur", "Affrontez l'IA",        GameMode::VsComputer};
+    buttons_[0] = {x, y, bw, bh, "Ordinateur simple", "IA facile",                GameMode::VsComputerEasy};
     y += bh + gap;
-    buttons_[1] = {x, y, bw, bh, "1 contre 1",          "Deux joueurs, meme ecran", GameMode::LocalOneVsOne};
+    buttons_[1] = {x, y, bw, bh, "Ordinateur expert", "IA qui anticipe",          GameMode::VsComputerHard};
     y += bh + gap;
-    buttons_[2] = {x, y, bw, bh, "Multijoueur",         "Jouer en reseau",       GameMode::Multiplayer};
+    buttons_[2] = {x, y, bw, bh, "1 contre 1",        "Deux joueurs, meme ecran", GameMode::LocalOneVsOne};
+    y += bh + gap;
+    buttons_[3] = {x, y, bw, bh, "Multijoueur",       "Jouer en reseau",          GameMode::Multiplayer};
 }
 
 int MenuScreen::buttonAt(float mx, float my) const {
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < kButtonCount; ++i) {
         const Button& b = buttons_[i];
         if (mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h) return i;
     }
@@ -68,15 +70,17 @@ void MenuScreen::handleEvent(const SDL_Event& e) {
             break;
         }
         case SDL_EVENT_MOUSE_BUTTON_UP:
-    if (e.button.button == SDL_BUTTON_LEFT) {
-        int h = buttonAt(e.button.x, e.button.y);
-        if (h >= 0) { choice_ = buttons_[h].mode; running_ = false; }
-    }
-    break;
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                int h = buttonAt(e.button.x, e.button.y);
+                if (h >= 0) { choice_ = buttons_[h].mode; running_ = false; }
+            }
+            break;
         case SDL_EVENT_KEY_DOWN:
             if (e.key.key == SDLK_ESCAPE) running_ = false;
-            else if (e.key.key == SDLK_UP)   selected_ = (selected_ + 2) % 3;
-            else if (e.key.key == SDLK_DOWN) selected_ = (selected_ + 1) % 3;
+            else if (e.key.key == SDLK_UP)
+                selected_ = (selected_ + kButtonCount - 1) % kButtonCount;
+            else if (e.key.key == SDLK_DOWN)
+                selected_ = (selected_ + 1) % kButtonCount;
             else if (e.key.key == SDLK_RETURN || e.key.key == SDLK_SPACE) {
                 choice_ = buttons_[selected_].mode;
                 running_ = false;
@@ -132,15 +136,15 @@ void MenuScreen::render() {
     centered("JEU DE CARRES", 3.0f, 100, kText);
     centered("Choisissez un mode de jeu", 1.5f, 148, kTextDim);
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < kButtonCount; ++i) {
         const Button& b = buttons_[i];
         const bool sel = (i == selected_);
-        const Color accent = (i == 1) ? kP2 : kP1;
+        // Bleu pour les modes contre l'IA, rouge pour les modes a deux.
+        const Color accent = (i >= 2) ? kP2 : kP1;
 
         setColor(renderer_, sel ? kPanelHi : kPanel);
         drawRoundedRect(b.x, b.y, b.w, b.h, 14.f);
 
-        // Liseret gauche colorÃĐ + contour si sÃĐlectionnÃĐ.
         setColor(renderer_, sel ? accent : withAlpha(accent, 110));
         drawRoundedRect(b.x, b.y, 7.f, b.h, 3.f);
         if (sel) {

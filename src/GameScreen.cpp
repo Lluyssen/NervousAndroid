@@ -2,63 +2,64 @@
 #include "Rules.h"
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include <string>
 #include <vector>
-#include <cstdlib>
 
 namespace ng {
 
 namespace {
-struct Color { Uint8 r, g, b, a; };
+struct Rgba { Uint8 r, g, b, a; };
 
-// --- Palette moderne ---
-constexpr Color kBg        {16, 18, 26, 255};
-constexpr Color kPanel     {26, 29, 42, 255};
-constexpr Color kPanelHi   {36, 40, 58, 255};
-constexpr Color kGridCell  {34, 38, 54, 255};
-constexpr Color kText      {236, 239, 248, 255};
-constexpr Color kTextDim   {140, 148, 172, 255};
-constexpr Color kP1        {64, 140, 255, 255};
-constexpr Color kP1Dark    {30, 80, 180, 255};
-constexpr Color kP2        {255, 92, 108, 255};
-constexpr Color kP2Dark    {180, 44, 64, 255};
-constexpr Color kHint      {255, 236, 130, 95};
-constexpr Color kHover     {255, 255, 255, 80};
-constexpr Color kGood      {80, 220, 140, 255};
-constexpr Color kCard      {28, 32, 48, 255};   // fond des cartes joueur
+// --- Palette ---
+constexpr Rgba kBg       {16, 18, 26, 255};
+constexpr Rgba kPanel    {26, 29, 42, 255};
+constexpr Rgba kGridCell {34, 38, 54, 255};
+constexpr Rgba kText     {236, 239, 248, 255};
+constexpr Rgba kTextDim  {140, 148, 172, 255};
+constexpr Rgba kP1       {64, 140, 255, 255};
+constexpr Rgba kP1Dark   {30, 80, 180, 255};
+constexpr Rgba kP2       {255, 92, 108, 255};
+constexpr Rgba kP2Dark   {180, 44, 64, 255};
+constexpr Rgba kHint     {255, 236, 130, 95};
+constexpr Rgba kGood     {80, 220, 140, 255};
+constexpr Rgba kCard     {28, 32, 48, 255};
+constexpr Rgba kIllegal  {255, 80, 80, 140};
 
-void setColor(SDL_Renderer* r, Color c) {
+// --- Mise en page (HUD) ---
+constexpr float kHudHeight   = 90.f;
+constexpr float kCardY       = 8.f;
+constexpr float kCardH       = 66.f;
+constexpr float kMargin      = 12.f;
+constexpr float kCardGap     = 12.f;
+constexpr float kStatusY     = 78.f;
+constexpr float kStatusH     = 28.f;
+
+// Budget de réflexion du MCTS (ms) et délai visuel du niveau Facile (ms).
+constexpr int    kAiThinkMs   = 700;
+constexpr Uint64 kEasyDelayMs = 350;
+
+void setColor(SDL_Renderer* r, Rgba c) {
     SDL_SetRenderDrawColor(r, c.r, c.g, c.b, c.a);
 }
-Color withAlpha(Color c, Uint8 a) { return Color{c.r, c.g, c.b, a}; }
-Color mix(Color a, Color b, float t) {
-    auto m = [&](Uint8 x, Uint8 y) {
-        return static_cast<Uint8>(x + (y - x) * t);
-    };
-    return Color{m(a.r, b.r), m(a.g, b.g), m(a.b, b.b), m(a.a, b.a)};
-}
-Color playerColor(Player p)     { return p == Player::One ? kP1 : kP2; }
-Color playerDarkColor(Player p) { return p == Player::One ? kP1Dark : kP2Dark; }
+Rgba withAlpha(Rgba c, Uint8 a) { return Rgba{c.r, c.g, c.b, a}; }
+Rgba playerColor(Player p) { return p == Player::One ? kP1 : kP2; }
 }  // namespace
 
 GameScreen::GameScreen(int width, int height) : game_(width, height) {}
 
 GameScreen::~GameScreen() {
+    if (aiThread_.joinable()) aiThread_.join();
     if (renderer_) SDL_DestroyRenderer(renderer_);
     if (window_)   SDL_DestroyWindow(window_);
 }
 
 bool GameScreen::init() {
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_Log("SDL_Init: %s", SDL_GetError());
-        return false;
-    }
     const Board& b = game_.board();
     cellSize_ = std::max(6, std::min(28, 900 / std::max(b.width(), b.height())));
 
-    // Largeur minimale pour afficher correctement les deux cartes joueurs.
-    int w = std::max(b.width() * cellSize_, 560);
-    int h = b.height() * cellSize_ + hudHeight_;
+    const int w = std::max(b.width() * cellSize_, 560);
+    const int h = b.height() * cellSize_ + static_cast<int>(kHudHeight);
 
     if (!SDL_CreateWindowAndRenderer("Jeu de carres", w, h, 0, &window_, &renderer_)) {
         SDL_Log("CreateWindow: %s", SDL_GetError());
@@ -66,72 +67,167 @@ bool GameScreen::init() {
     }
     SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
 
-    // PV max = PV de dÃĐpart (les bases viennent d'ÃŠtre crÃĐÃĐes).
     maxHp_ = std::max(1, std::max(game_.hp(Player::One), game_.hp(Player::Two)));
     prevHp_[0] = game_.hp(Player::One);
     prevHp_[1] = game_.hp(Player::Two);
     lastTicks_ = SDL_GetTicks();
 
+    // Purge les événements hérités du menu : évite un double clic fantôme.
+    // Sans cela, un clic de validation du menu serait compté sur le plateau.
     SDL_RaiseWindow(window_);
-SDL_PumpEvents();
-SDL_FlushEvents(SDL_EVENT_FIRST, SDL_EVENT_LAST);
-startTicks_ = SDL_GetTicks();  
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_EVENT_FIRST, SDL_EVENT_LAST);
+    startTicks_ = SDL_GetTicks();
 
+    rebuildCache();
     setMessage("J1 : placez votre base.");
     return true;
 }
 
-void GameScreen::playComputerTurn() {
-    static Uint64 nextMove = 0;
-    if (SDL_GetTicks() < nextMove) return;      // petit dÃĐlai pour voir le coup
-    nextMove = SDL_GetTicks() + 350;
+void GameScreen::setMode(GameMode m) {
+    mode_ = m;
+    aiLevel_ = (m == GameMode::VsComputerHard) ? AiLevel::Hard : AiLevel::Easy;
+}
+
+// ---------------------------------------------------------------------------
+//  Helpers d'état
+// ---------------------------------------------------------------------------
+
+// Joueur qui doit agir maintenant (tient compte du déplacement de base forcé).
+Player GameScreen::currentActor() const {
+    return game_.phase() == Phase::RelocateBase ? game_.mustRelocatePlayer()
+                                                : game_.current();
+}
+
+// Vrai si c'est à l'ordinateur de jouer. Point unique de vérité.
+bool GameScreen::isComputerTurn() const {
+    return vsComputer() && !game_.isOver() && currentActor() == Player::Two;
+}
+
+// Un seul point de passage après toute modification de la partie.
+void GameScreen::afterStateChange(Result r) {
+    setMessage(describe(r));
+    rebuildCache();
+}
+
+// ---------------------------------------------------------------------------
+//  Intelligence artificielle
+// ---------------------------------------------------------------------------
+
+// Lance la réflexion MCTS dans un thread, sur une COPIE de la partie.
+void GameScreen::startAiThinking() {
+    if (aiBusy_.load()) return;
+    if (aiThread_.joinable()) aiThread_.join();
+    aiBusy_ = true;
+    aiReady_ = false;
+
+    Game snapshot = game_;
+    aiThread_ = std::thread([this, snapshot]() {
+        Move m = mcts_.chooseMove(snapshot, kAiThinkMs);
+        aiMove_ = m;             // écrit avant la publication de aiReady_
+        aiReady_.store(true);    // release : rend aiMove_ visible au thread principal
+    });
+}
+
+// Applique le coup calculé par le MCTS (thread principal).
+void GameScreen::applyAiMove() {
+    if (aiThread_.joinable()) aiThread_.join();
+    aiBusy_ = false;
+    aiReady_ = false;
 
     Result r = Result::WrongPhase;
+    switch (aiMove_.kind) {
+        case Move::Kind::Square:   r = game_.placeSquare(aiMove_.pos);  break;
+        case Move::Kind::EndTurn:  r = game_.endTurn();                 break;
+        case Move::Kind::Base:     r = game_.placeBase(aiMove_.pos);    break;
+        case Move::Kind::Relocate: r = game_.relocateBase(aiMove_.pos); break;
+    }
+
+    if (r == Result::Ok) {
+        afterStateChange(r);
+    } else {
+        // Le MCTS a proposé un coup refusé : un seul repli, sans boucle.
+        fallbackAiMove();
+    }
+}
+
+// Coup de repli aléatoire légal. Garantit la progression de la partie.
+void GameScreen::fallbackAiMove() {
+    Result r = Result::WrongPhase;
+
     switch (game_.phase()) {
+        case Phase::PlaceBaseP1:
         case Phase::PlaceBaseP2: {
             auto cells = game_.legalInitialBasePlacements();
-            if (!cells.empty()) r = game_.placeBase(cells[rand() % cells.size()]);
+            if (!cells.empty()) {
+                std::uniform_int_distribution<size_t> d(0, cells.size() - 1);
+                r = game_.placeBase(cells[d(rng_)]);
+            }
             break;
         }
         case Phase::RelocateBase: {
             auto cells = game_.legalBaseRelocations();
-            if (!cells.empty()) r = game_.relocateBase(cells[rand() % cells.size()]);
+            if (!cells.empty()) {
+                std::uniform_int_distribution<size_t> d(0, cells.size() - 1);
+                r = game_.relocateBase(cells[d(rng_)]);
+            }
             break;
         }
         case Phase::PlaySquares: {
             auto cells = game_.legalSquarePlacements();
-            if (cells.empty()) { r = game_.endTurn(); break; }
-            // Heuristique : la pose la plus proche de la base adverse.
-            Pos target;
-            if (!rules::findBase(game_.board(), Player::One, &target)) target = cells[0];
-            Pos best = cells[0];
-            int bestD = 1 << 30;
-            for (const Pos& c : cells) {
-                int d = std::abs(c.x - target.x) + std::abs(c.y - target.y);
-                if (d < bestD) { bestD = d; best = c; }
+            // Aucune pose possible : on termine le tour (sinon blocage).
+            if (cells.empty()) {
+                r = game_.endTurn();
+                break;
             }
-            r = game_.placeSquare(best);
+            std::uniform_int_distribution<size_t> d(0, cells.size() - 1);
+            r = game_.placeSquare(cells[d(rng_)]);
             break;
         }
-        default: return;
+        default:
+            break;
     }
-    setMessage(describe(r));
-    dirty_ = true;
+
+    // Garde-fou : tour en cours, rien joué, au moins une pose faite -> fin de tour.
+    if (r != Result::Ok && game_.phase() == Phase::PlaySquares &&
+        game_.placedThisTurn() >= 1) {
+        r = game_.endTurn();
+    }
+
+    afterStateChange(r);
 }
+
+void GameScreen::playComputerTurn() {
+    if (aiLevel_ == AiLevel::Easy) {
+        // IA facile : coups légaux aléatoires, avec un délai pour qu'on les voie.
+        const Uint64 now = SDL_GetTicks();
+        if (now - lastEasyMoveTicks_ < kEasyDelayMs) return;
+        lastEasyMoveTicks_ = now;
+        fallbackAiMove();
+        return;
+    }
+
+    // IA experte : MCTS asynchrone.
+    if (aiReady_.load())      applyAiMove();
+    else if (!aiBusy_.load()) startAiThinking();
+}
+
+// ---------------------------------------------------------------------------
+//  Boucle principale et événements
+// ---------------------------------------------------------------------------
 
 void GameScreen::run() {
     while (running_) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) handleEvent(e);
 
-        if (mode_ == GameMode::VsComputer && !game_.isOver() &&
-            game_.current() == Player::Two)
-            playComputerTurn();
+        if (isComputerTurn()) playComputerTurn();
 
         updateAnimations();
         render();
         SDL_Delay(16);
     }
+    if (aiThread_.joinable()) aiThread_.join();
 }
 
 void GameScreen::handleEvent(const SDL_Event& e) {
@@ -144,30 +240,31 @@ void GameScreen::handleEvent(const SDL_Event& e) {
             break;
         case SDL_EVENT_KEY_DOWN:
             if (e.key.key == SDLK_ESCAPE) running_ = false;
-            if (e.key.key == SDLK_SPACE || e.key.key == SDLK_RETURN) {
-                Result r = game_.endTurn();
-                setMessage(describe(r));
-                dirty_ = true;
+            if ((e.key.key == SDLK_SPACE || e.key.key == SDLK_RETURN) && !isComputerTurn()) {
+                afterStateChange(game_.endTurn());
             }
             break;
-        default: break;
+        default:
+            break;
     }
 }
 
 bool GameScreen::pixelToCell(float mx, float my, Pos* out) const {
-    if (my < hudHeight_) return false;
-    int x = static_cast<int>(mx) / cellSize_;
-    int y = (static_cast<int>(my) - hudHeight_) / cellSize_;
+    if (my < kHudHeight) return false;
+    const int x = static_cast<int>(mx) / cellSize_;
+    const int y = (static_cast<int>(my) - static_cast<int>(kHudHeight)) / cellSize_;
     if (x < 0 || y < 0 || x >= game_.board().width() || y >= game_.board().height())
         return false;
     *out = Pos{x, y};
     return true;
 }
 
+// Recalcule les cases jouables. Appelé uniquement après un changement d'état.
 void GameScreen::rebuildCache() {
     const Board& b = game_.board();
     const int W = b.width(), H = b.height();
-    legalCells_.clear();
+
+    std::vector<Pos> cells;
     legalTlMask_.assign(static_cast<size_t>(W) * H, 0);
     hintMask_.assign(static_cast<size_t>(W) * H, 0);
 
@@ -177,59 +274,51 @@ void GameScreen::rebuildCache() {
 
     switch (ph) {
         case Phase::PlaceBaseP1:
-        case Phase::PlaceBaseP2:
-            legalCells_ = game_.legalInitialBasePlacements();
-            break;
-        case Phase::RelocateBase:
-            legalCells_ = game_.legalBaseRelocations();
-            break;
-        case Phase::PlaySquares:
-            legalCells_ = game_.legalSquarePlacements();
-            break;
-        default:
-            break;
+        case Phase::PlaceBaseP2:  cells = game_.legalInitialBasePlacements(); break;
+        case Phase::RelocateBase: cells = game_.legalBaseRelocations();       break;
+        case Phase::PlaySquares:  cells = game_.legalSquarePlacements();      break;
+        default: break;
     }
 
-    for (const Pos& p : legalCells_) {
+    for (const Pos& p : cells) {
         if (p.x < 0 || p.y < 0 || p.x >= W || p.y >= H) continue;
         legalTlMask_[static_cast<size_t>(p.y) * W + p.x] = 1;
 
         if (isBase) {
-            // Une base occupe 2x2 : on marque les 4 cases couvertes,
-            // sinon la derniÃĻre ligne/colonne n'affiche jamais de rond.
-            for (int dy = 0; dy < 2; ++dy) {
+            // Une base couvre 2x2 : on marque les 4 cases.
+            for (int dy = 0; dy < 2; ++dy)
                 for (int dx = 0; dx < 2; ++dx) {
-                    int cx = p.x + dx, cy = p.y + dy;
+                    const int cx = p.x + dx, cy = p.y + dy;
                     if (cx < W && cy < H)
                         hintMask_[static_cast<size_t>(cy) * W + cx] = 1;
                 }
-            }
         } else {
             hintMask_[static_cast<size_t>(p.y) * W + p.x] = 1;
         }
     }
-    dirty_ = false;
 }
 
+// Cherche le coin haut-gauche légal le plus proche d'un clic (2x2 de la base).
+// Ordre explicite : la case cliquée, puis décalée vers le haut/gauche.
 bool GameScreen::findLegalTl(Pos click, Pos* out) const {
     const int W = game_.board().width(), H = game_.board().height();
-    for (int dy = 0; dy >= -1; --dy) {
-        for (int dx = 0; dx >= -1; --dx) {
-            int tx = click.x + dx, ty = click.y + dy;
+    static constexpr int kOffsets[2] = {0, -1};
+    for (int dy : kOffsets)
+        for (int dx : kOffsets) {
+            const int tx = click.x + dx, ty = click.y + dy;
             if (tx < 0 || ty < 0 || tx >= W || ty >= H) continue;
             if (legalTlMask_[static_cast<size_t>(ty) * W + tx]) {
                 *out = Pos{tx, ty};
                 return true;
             }
         }
-    }
     return false;
 }
 
 void GameScreen::handleClick(float mx, float my) {
     if (SDL_GetTicks() - startTicks_ < 250) return;
-    if (mode_ == GameMode::VsComputer && game_.current() == Player::Two) return;
-    if (game_.isOver()) return;
+    if (game_.isOver() || isComputerTurn()) return;
+
     Pos p;
     if (!pixelToCell(mx, my, &p)) return;
 
@@ -243,24 +332,20 @@ void GameScreen::handleClick(float mx, float my) {
             r = game_.placeSquare(p);
             break;
         case Phase::RelocateBase: {
-            if (dirty_) rebuildCache();
             Pos tl;
-            if (findLegalTl(p, &tl)) r = game_.relocateBase(tl);
-            else                     r = game_.relocateBase(p);
+            r = game_.relocateBase(findLegalTl(p, &tl) ? tl : p);
             break;
         }
         case Phase::GameOver:
             return;
     }
-    setMessage(describe(r));
-    dirty_ = true;
+    afterStateChange(r);
 }
 
 // ---------------------------------------------------------------------------
 //  Primitives de dessin
 // ---------------------------------------------------------------------------
 
-// Rectangle arrondi : un corps central + des bandes horizontales pour les coins.
 void GameScreen::drawRoundedRect(float x, float y, float w, float h, float radius) {
     radius = std::min(radius, std::min(w, h) * 0.5f);
     if (radius < 1.f) {
@@ -268,14 +353,13 @@ void GameScreen::drawRoundedRect(float x, float y, float w, float h, float radiu
         SDL_RenderFillRect(renderer_, &r);
         return;
     }
-    // Corps central.
     SDL_FRect mid{x, y + radius, w, h - 2 * radius};
     SDL_RenderFillRect(renderer_, &mid);
-    // Coins : une bande par ligne de pixel, largeur selon le cercle.
-    int rr = static_cast<int>(radius);
+
+    const int rr = static_cast<int>(radius);
     for (int i = 0; i < rr; ++i) {
-        float dy = radius - i - 0.5f;
-        float dx = radius - std::sqrt(std::max(0.f, radius * radius - dy * dy));
+        const float dy = radius - i - 0.5f;
+        const float dx = radius - std::sqrt(std::max(0.f, radius * radius - dy * dy));
         SDL_FRect top{x + dx, y + i, w - 2 * dx, 1.f};
         SDL_FRect bot{x + dx, y + h - 1 - i, w - 2 * dx, 1.f};
         SDL_RenderFillRect(renderer_, &top);
@@ -290,19 +374,19 @@ void GameScreen::drawText(float x, float y, const std::string& s, float scale) {
 }
 
 std::string GameScreen::playerName(Player pl) const {
+    if (vsComputer() && pl == Player::Two) return "Ordinateur";
     return pl == Player::One ? "Joueur 1" : "Joueur 2";
 }
 
 void GameScreen::updateAnimations() {
-    Uint64 now = SDL_GetTicks();
-    float dt = static_cast<float>(now - lastTicks_) / 1000.f;
+    const Uint64 now = SDL_GetTicks();
+    const float dt = static_cast<float>(now - lastTicks_) / 1000.f;
     lastTicks_ = now;
     time_ += dt;
 
-    // DÃĐtecte la perte d'un PV et lance un flash qui s'estompe en ~0,6 s.
     for (int i = 0; i < 2; ++i) {
-        Player pl = (i == 0) ? Player::One : Player::Two;
-        int hp = game_.hp(pl);
+        const Player pl = (i == 0) ? Player::One : Player::Two;
+        const int hp = game_.hp(pl);
         if (prevHp_[i] >= 0 && hp < prevHp_[i]) lostFlash_[i] = 1.f;
         prevHp_[i] = hp;
         lostFlash_[i] = std::max(0.f, lostFlash_[i] - dt / 0.6f);
@@ -318,64 +402,54 @@ void GameScreen::drawGrid() {
     const float gap = (cellSize_ >= 12) ? 1.f : 0.f;
     const float rad = (cellSize_ >= 16) ? 3.f : 0.f;
 
+    // Un seul parcours : fond de case puis liseret sur les bases.
     for (int y = 0; y < b.height(); ++y) {
         for (int x = 0; x < b.width(); ++x) {
-            float fx = static_cast<float>(x * cellSize_);
-            float fy = static_cast<float>(y * cellSize_ + hudHeight_);
-            float sz = static_cast<float>(cellSize_) - gap;
+            const float fx = static_cast<float>(x * cellSize_);
+            const float fy = static_cast<float>(y * cellSize_) + kHudHeight;
+            const float sz = static_cast<float>(cellSize_) - gap;
 
-            Cell c = b.get(Pos{x, y});
+            const Cell c = b.get(Pos{x, y});
             if (c == squareOf(Player::One))      setColor(renderer_, kP1);
             else if (c == squareOf(Player::Two)) setColor(renderer_, kP2);
             else if (c == baseOf(Player::One))   setColor(renderer_, kP1Dark);
             else if (c == baseOf(Player::Two))   setColor(renderer_, kP2Dark);
             else                                 setColor(renderer_, kGridCell);
-
             drawRoundedRect(fx, fy, sz, sz, rad);
-        }
-    }
 
-    // Liseret lumineux sur les bases pour bien les distinguer.
-    for (int y = 0; y < b.height(); ++y) {
-        for (int x = 0; x < b.width(); ++x) {
-            Cell c = b.get(Pos{x, y});
-            bool b1 = (c == baseOf(Player::One));
-            bool b2 = (c == baseOf(Player::Two));
-            if (!b1 && !b2) continue;
-            setColor(renderer_, withAlpha(b1 ? kP1 : kP2, 150));
-            float m = std::max(1.f, cellSize_ * 0.18f);
-            SDL_FRect r{x * (float)cellSize_ + m,
-                        y * (float)cellSize_ + hudHeight_ + m,
-                        cellSize_ - 2 * m - 1.f, cellSize_ - 2 * m - 1.f};
-            SDL_RenderFillRect(renderer_, &r);
+            const bool b1 = (c == baseOf(Player::One));
+            const bool b2 = (c == baseOf(Player::Two));
+            if (b1 || b2) {
+                setColor(renderer_, withAlpha(b1 ? kP1 : kP2, 150));
+                const float m = std::max(1.f, cellSize_ * 0.18f);
+                SDL_FRect r{fx + m, fy + m, sz - 2 * m, sz - 2 * m};
+                SDL_RenderFillRect(renderer_, &r);
+            }
         }
     }
 }
 
 void GameScreen::drawHighlights() {
     if (game_.phase() == Phase::GameOver) return;
-    if (dirty_) rebuildCache();
+    if (isComputerTurn()) return;
 
     const Board& b = game_.board();
     const int W = b.width(), H = b.height();
 
-    // Les marqueurs respirent doucement (pulsation sinusoÃŊdale).
-    float pulse = 0.65f + 0.35f * std::sin(time_ * 4.f);
-    Color hint = withAlpha(kHint, static_cast<Uint8>(kHint.a * pulse + 40));
-    setColor(renderer_, hint);
+    const float pulse = 0.65f + 0.35f * std::sin(time_ * 4.f);
+    setColor(renderer_, withAlpha(kHint, static_cast<Uint8>(kHint.a * pulse + 40)));
 
-    for (int y = 0; y < H; ++y) {
+    for (int y = 0; y < H; ++y)
         for (int x = 0; x < W; ++x) {
             if (!hintMask_[static_cast<size_t>(y) * W + x]) continue;
-            float m = cellSize_ * 0.30f;
+            const float m = cellSize_ * 0.30f;
             drawRoundedRect(x * (float)cellSize_ + m,
-                            y * (float)cellSize_ + hudHeight_ + m,
+                            y * (float)cellSize_ + kHudHeight + m,
                             cellSize_ - 2 * m, cellSize_ - 2 * m,
                             (cellSize_ - 2 * m) * 0.5f);
         }
-    }
 
-    // --- AperÃ§u sous la souris ---
+    // Aperçu sous la souris.
     const Phase ph = game_.phase();
     const bool isBase = (ph == Phase::PlaceBaseP1 || ph == Phase::PlaceBaseP2 ||
                          ph == Phase::RelocateBase);
@@ -387,156 +461,142 @@ void GameScreen::drawHighlights() {
     Pos hover;
     if (!pixelToCell(mx, my, &hover)) return;
 
-    Color pc = playerColor(game_.current());
+    const Rgba pc = playerColor(currentActor());
 
     if (isBase) {
-        // Base 2x2 : on cherche le coin haut-gauche lÃĐgal couvrant la case survolÃĐe.
         Pos tl;
         if (findLegalTl(hover, &tl)) {
             setColor(renderer_, withAlpha(pc, 150));
             drawRoundedRect(tl.x * (float)cellSize_,
-                            tl.y * (float)cellSize_ + hudHeight_,
+                            tl.y * (float)cellSize_ + kHudHeight,
                             cellSize_ * 2 - 1.f, cellSize_ * 2 - 1.f, 4.f);
-            // Contour pour bien voir l'emprise.
-            setColor(renderer_, withAlpha(Color{255, 255, 255, 255}, 120));
+            setColor(renderer_, Rgba{255, 255, 255, 120});
             SDL_FRect o{tl.x * (float)cellSize_,
-                        tl.y * (float)cellSize_ + hudHeight_,
+                        tl.y * (float)cellSize_ + kHudHeight,
                         cellSize_ * 2 - 1.f, cellSize_ * 2 - 1.f};
             SDL_RenderRect(renderer_, &o);
         } else {
-            // Emplacement illÃĐgal : case survolÃĐe en rouge.
-            setColor(renderer_, Color{255, 80, 80, 140});
+            setColor(renderer_, kIllegal);
             SDL_FRect r{hover.x * (float)cellSize_,
-                        hover.y * (float)cellSize_ + hudHeight_,
+                        hover.y * (float)cellSize_ + kHudHeight,
                         cellSize_ - 1.f, cellSize_ - 1.f};
             SDL_RenderFillRect(renderer_, &r);
         }
     } else {
-        // CarrÃĐ 1x1 : lÃĐgal si la case survolÃĐe est dans le masque de pose.
-        bool legal = hintMask_[static_cast<size_t>(hover.y) * W + hover.x] != 0;
-        setColor(renderer_, legal ? withAlpha(pc, 160) : Color{255, 80, 80, 140});
+        const bool legal = hintMask_[static_cast<size_t>(hover.y) * W + hover.x] != 0;
+        setColor(renderer_, legal ? withAlpha(pc, 160) : kIllegal);
         SDL_FRect r{hover.x * (float)cellSize_,
-                    hover.y * (float)cellSize_ + hudHeight_,
+                    hover.y * (float)cellSize_ + kHudHeight,
                     cellSize_ - 1.f, cellSize_ - 1.f};
         SDL_RenderFillRect(renderer_, &r);
     }
 }
 
 // ---------------------------------------------------------------------------
-//  HUD moderne
+//  HUD
 // ---------------------------------------------------------------------------
 
 void GameScreen::drawPlayerCard(Player pl, float x, float y, float w, float h) {
     const int idx = (pl == Player::One) ? 0 : 1;
-    const bool active = (game_.current() == pl) && !game_.isOver();
-    Color pc = playerColor(pl);
+    const bool active = (currentActor() == pl) && !game_.isOver();
+    const Rgba pc = playerColor(pl);
 
-    // Fond de la carte
     setColor(renderer_, kCard);
     drawRoundedRect(x, y, w, h, 12.f);
 
-    // Liseret de couleur si c'est son tour
     if (active) {
-        float pulse = 0.6f + 0.4f * std::sin(time_ * 4.f);
+        const float pulse = 0.6f + 0.4f * std::sin(time_ * 4.f);
         setColor(renderer_, withAlpha(pc, static_cast<Uint8>(120 + 100 * pulse)));
         SDL_FRect o{x, y, w, h};
         SDL_RenderRect(renderer_, &o);
     }
 
-    // Pastille + nom, centrÃĐs verticalement (texte ~16 px de haut Ã  l'ÃĐchelle 2)
     setColor(renderer_, pc);
     drawRoundedRect(x + 14, y + (h - 14.f) * 0.5f, 14.f, 14.f, 7.f);
     setColor(renderer_, kText);
     drawText(x + 38, y + (h - 16.f) * 0.5f, playerName(pl), 2.0f);
 
-    // --- Points de vie : un carrÃĐ par PV, Ã  droite, centrÃĐs verticalement ---
+    // PV : un carré par point de vie.
     const int hp = game_.hp(pl);
     const int total = std::max(1, maxHp_);
     const float gap = 6.f;
     const float box = std::min(20.f, h - 20.f);
     const float rowW = total * box + (total - 1) * gap;
-
-    // On rÃĐserve la place du compteur "4/4" tout Ã  droite.
     const float counterW = 50.f;
     const float bx = x + w - 14.f - counterW - rowW;
     const float by = y + (h - box) * 0.5f;
 
     for (int i = 0; i < total; ++i) {
         const float cx = bx + i * (box + gap);
-        const bool alive = i < hp;
-
-        if (alive) {
-            // PV restant : couleur du joueur + petit reflet
+        if (i < hp) {
             setColor(renderer_, pc);
             drawRoundedRect(cx, by, box, box, 5.f);
-            setColor(renderer_, withAlpha(Color{255, 255, 255, 255}, 60));
+            setColor(renderer_, Rgba{255, 255, 255, 60});
             drawRoundedRect(cx + 3, by + 3, box - 6, (box - 6) * 0.45f, 3.f);
         } else {
-            // PV perdu : case vide sombre, contour discret
-            setColor(renderer_, Color{255, 255, 255, 18});
+            setColor(renderer_, Rgba{255, 255, 255, 18});
             drawRoundedRect(cx, by, box, box, 5.f);
-            setColor(renderer_, Color{255, 255, 255, 45});
+            setColor(renderer_, Rgba{255, 255, 255, 45});
             SDL_FRect o{cx, by, box, box};
             SDL_RenderRect(renderer_, &o);
         }
     }
 
-    // Flash rouge sur le dernier PV perdu (dÃĐcroÃŪt en ~0,6 s)
-    if (lostFlash_[idx] > 0.f) {
-        const int lostIdx = hp;  // le carrÃĐ qui vient de s'ÃĐteindre
-        if (lostIdx >= 0 && lostIdx < total) {
-            const float cx = bx + lostIdx * (box + gap);
-            setColor(renderer_, Color{255, 70, 70,
-                     static_cast<Uint8>(200 * lostFlash_[idx])});
-            drawRoundedRect(cx, by, box, box, 5.f);
-        }
+    // Flash rouge sur le PV qui vient de disparaître.
+    if (lostFlash_[idx] > 0.f && hp >= 0 && hp < total) {
+        const float cx = bx + hp * (box + gap);
+        setColor(renderer_, Rgba{255, 70, 70,
+                 static_cast<Uint8>(200 * lostFlash_[idx])});
+        drawRoundedRect(cx, by, box, box, 5.f);
     }
 
-    // Compteur numÃĐrique Ã  l'extrÃŠme droite, centrÃĐ verticalement
-    std::string t = std::to_string(hp) + "/" + std::to_string(total);
+    const std::string t = std::to_string(hp) + "/" + std::to_string(total);
     setColor(renderer_, kTextDim);
     drawText(x + w - 14.f - counterW + 6.f, y + (h - 12.f) * 0.5f, t, 1.5f);
 }
 
 void GameScreen::drawStatusBar(float w) {
-    const float y = 78.f, h = 28.f, margin = 12.f;
-    Player cur = game_.current();
-    Color accent = game_.isOver() ? kGood : playerColor(cur);
+    const float margin = kMargin;
+    const Player cur = currentActor();
+    const Rgba accent = game_.isOver() ? kGood : playerColor(cur);
 
     std::string phase;
     if (game_.isOver()) {
         phase = "Partie terminee";
     } else {
+        const bool computerTurn = isComputerTurn();
         switch (game_.phase()) {
             case Phase::PlaceBaseP1:
-            case Phase::PlaceBaseP2:  phase = "Placez votre base"; break;
-            case Phase::PlaySquares:  phase = "Posez vos carres  -  Espace : fin de tour"; break;
-            case Phase::RelocateBase: phase = "Deplacez votre base"; break;
+            case Phase::PlaceBaseP2:
+                phase = computerTurn ? "Place sa base" : "Placez votre base";
+                break;
+            case Phase::PlaySquares:
+                phase = computerTurn ? "Reflechit..."
+                                     : "Posez vos carres  -  Espace : fin de tour";
+                break;
+            case Phase::RelocateBase:
+                phase = computerTurn ? "Deplace sa base" : "Deplacez votre base";
+                break;
             default: break;
         }
         phase = "Tour de " + playerName(cur) + "  |  " + phase;
     }
 
-    // Largeur du texte : 8 px par caractÃĻre Ã  l'ÃĐchelle 1, multipliÃĐ par l'ÃĐchelle du texte.
     const float textScale = 1.5f;
     const float textW = static_cast<float>(phase.size()) * 8.f * textScale;
     const float textH = 8.f * textScale;
-
-    // Largeur du bandeau = texte + marges, bornÃĐe Ã  la largeur disponible.
     const float padX = 24.f;
     const float barW = std::min(w - 2 * margin, textW + 2 * padX);
     const float barX = (w - barW) * 0.5f;
 
-    // Fond du bandeau.
     setColor(renderer_, kPanel);
-    drawRoundedRect(barX, y, barW, h, 10.f);
-    // Liseret colorÃĐ selon le joueur actif, Ã  gauche du bandeau.
+    drawRoundedRect(barX, kStatusY, barW, kStatusH, 10.f);
     setColor(renderer_, accent);
-    drawRoundedRect(barX, y, 6.f, h, 3.f);
+    drawRoundedRect(barX, kStatusY, 6.f, kStatusH, 3.f);
 
-    // Texte centrÃĐ horizontalement et verticalement dans le bandeau.
     setColor(renderer_, kText);
-    drawText(barX + (barW - textW) * 0.5f, y + (h - textH) * 0.5f, phase, textScale);
+    drawText(barX + (barW - textW) * 0.5f,
+             kStatusY + (kStatusH - textH) * 0.5f, phase, textScale);
 }
 
 void GameScreen::drawHud() {
@@ -544,40 +604,35 @@ void GameScreen::drawHud() {
     SDL_GetWindowSize(window_, &winW, &winH);
     const float w = static_cast<float>(winW);
 
-    // Fond du HUD.
     setColor(renderer_, kBg);
-    SDL_FRect bg{0, 0, w, static_cast<float>(hudHeight_)};
+    SDL_FRect bg{0, 0, w, kHudHeight};
     SDL_RenderFillRect(renderer_, &bg);
 
-    // Deux cartes cÃīte Ã  cÃīte.
-    const float margin = 12.f, gap = 12.f, cardY = 8.f, cardH = 66.f;
-    const float cardW = (w - 2 * margin - gap) / 2.f;
-    drawPlayerCard(Player::One, margin, cardY, cardW, cardH);
-    drawPlayerCard(Player::Two, margin + cardW + gap, cardY, cardW, cardH);
+    const float cardW = (w - 2 * kMargin - kCardGap) / 2.f;
+    drawPlayerCard(Player::One, kMargin, kCardY, cardW, kCardH);
+    drawPlayerCard(Player::Two, kMargin + cardW + kCardGap, kCardY, cardW, kCardH);
 
     drawStatusBar(w);
 }
 
-// Superposition de fin de partie.
 void GameScreen::drawGameOver() {
     if (!game_.isOver()) return;
     int winW = 0, winH = 0;
     SDL_GetWindowSize(window_, &winW, &winH);
     const float w = static_cast<float>(winW), h = static_cast<float>(winH);
 
-    // Voile sombre.
-    setColor(renderer_, Color{8, 9, 14, 200});
+    setColor(renderer_, Rgba{8, 9, 14, 200});
     SDL_FRect veil{0, 0, w, h};
     SDL_RenderFillRect(renderer_, &veil);
 
-    const Player win = game_.winner();
-    const Color col = playerColor(win);
+    if (!game_.winner().has_value()) return;
+    const Player win = *game_.winner();
+    const Rgba col = playerColor(win);
 
     const float cw = std::min(w - 40.f, 460.f), ch = 190.f;
     const float cx = (w - cw) / 2.f, cy = (h - ch) / 2.f;
 
-    // Halo pulsant + carte.
-    float pulse = 0.6f + 0.4f * std::sin(time_ * 3.f);
+    const float pulse = 0.6f + 0.4f * std::sin(time_ * 3.f);
     setColor(renderer_, withAlpha(col, static_cast<Uint8>(50 + 60 * pulse)));
     drawRoundedRect(cx - 6, cy - 6, cw + 12, ch + 12, 22.f);
     setColor(renderer_, kPanel);
@@ -585,13 +640,11 @@ void GameScreen::drawGameOver() {
     setColor(renderer_, col);
     drawRoundedRect(cx, cy, cw, 8.f, 4.f);
 
-    // Textes centrÃĐs : 8 px par caractÃĻre Ã  l'ÃĐchelle 1.
-    auto centered = [&](const std::string& s, float scale, float y, Color c) {
-        float tw = static_cast<float>(s.size()) * 8.f * scale;
+    auto centered = [&](const std::string& s, float scale, float y, Rgba c) {
+        const float tw = static_cast<float>(s.size()) * 8.f * scale;
         setColor(renderer_, c);
         drawText(cx + (cw - tw) * 0.5f, y, s, scale);
     };
-
     centered("VICTOIRE", 2.0f, cy + 34, kTextDim);
     centered(playerName(win) + " a gagne !", 3.0f, cy + 74, col);
     centered("Echap : quitter", 1.5f, cy + ch - 36, kTextDim);
@@ -602,14 +655,14 @@ void GameScreen::drawMessageToast() {
     int winW = 0, winH = 0;
     SDL_GetWindowSize(window_, &winW, &winH);
 
-    float tw = static_cast<float>(message_.size()) * 8.f * 1.5f + 36.f;
-    float th = 30.f;
-    float tx = (winW - tw) / 2.f;
-    float ty = static_cast<float>(winH) - th - 12.f;
+    const float tw = static_cast<float>(message_.size()) * 8.f * 1.5f + 36.f;
+    const float th = 30.f;
+    const float tx = (winW - tw) / 2.f;
+    const float ty = static_cast<float>(winH) - th - 12.f;
 
-    setColor(renderer_, Color{10, 12, 18, 225});
+    setColor(renderer_, Rgba{10, 12, 18, 225});
     drawRoundedRect(tx, ty, tw, th, 15.f);
-    setColor(renderer_, withAlpha(playerColor(game_.current()), 200));
+    setColor(renderer_, withAlpha(playerColor(currentActor()), 200));
     drawRoundedRect(tx + 8, ty + th / 2 - 4, 8.f, 8.f, 4.f);
     setColor(renderer_, kText);
     drawText(tx + 24, ty + 9, message_, 1.5f);

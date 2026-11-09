@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lino/Desktop/NervousAndroid/core/Board.cpp" "CMakeFiles/nervous_core.dir/core/Board.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Board.cpp.o.d"
   "/home/lino/Desktop/NervousAndroid/core/Game.cpp" "CMakeFiles/nervous_core.dir/core/Game.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Game.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/core/MctsAi.cpp" "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o.d"
   "/home/lino/Desktop/NervousAndroid/core/Rules.cpp" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o.d"
   )
 

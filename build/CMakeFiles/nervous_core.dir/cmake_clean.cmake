@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/nervous_core.dir/core/Board.cpp.o.d"
   "CMakeFiles/nervous_core.dir/core/Game.cpp.o"
   "CMakeFiles/nervous_core.dir/core/Game.cpp.o.d"
+  "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o"
+  "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o.d"
   "CMakeFiles/nervous_core.dir/core/Rules.cpp.o"
   "CMakeFiles/nervous_core.dir/core/Rules.cpp.o.d"
   "libnervous_core.a"

@@ -85,12 +85,12 @@ clean: CMakeFiles/nervous_game.dir/clean
 CMakeFiles/nervous_core.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=1,2,3,4 "Built target nervous_core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target nervous_core"
 .PHONY : CMakeFiles/nervous_core.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/nervous_core.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/nervous_core.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 0
 .PHONY : CMakeFiles/nervous_core.dir/rule
@@ -111,12 +111,12 @@ CMakeFiles/nervous_core.dir/clean:
 CMakeFiles/test_rules.dir/all: CMakeFiles/nervous_core.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_rules.dir/build.make CMakeFiles/test_rules.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_rules.dir/build.make CMakeFiles/test_rules.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=9,10 "Built target test_rules"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=10,11 "Built target test_rules"
 .PHONY : CMakeFiles/test_rules.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test_rules.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 7
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_rules.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 0
 .PHONY : CMakeFiles/test_rules.dir/rule
@@ -137,12 +137,12 @@ CMakeFiles/test_rules.dir/clean:
 CMakeFiles/nervous_game.dir/all: CMakeFiles/nervous_core.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=5,6,7,8 "Built target nervous_game"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=6,7,8,9 "Built target nervous_game"
 .PHONY : CMakeFiles/nervous_game.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/nervous_game.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/nervous_game.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/lino/Desktop/NervousAndroid/build/CMakeFiles 0
 .PHONY : CMakeFiles/nervous_game.dir/rule

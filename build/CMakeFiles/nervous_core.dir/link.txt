@@ -1,2 +1,2 @@
-/usr/bin/ar qc libnervous_core.a CMakeFiles/nervous_core.dir/core/Board.cpp.o CMakeFiles/nervous_core.dir/core/Rules.cpp.o CMakeFiles/nervous_core.dir/core/Game.cpp.o
+/usr/bin/ar qc libnervous_core.a CMakeFiles/nervous_core.dir/core/Board.cpp.o CMakeFiles/nervous_core.dir/core/Rules.cpp.o CMakeFiles/nervous_core.dir/core/Game.cpp.o CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o
 /usr/bin/ranlib libnervous_core.a

@@ -111,11 +111,26 @@ CMakeFiles/nervous_core.dir/core/Game.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_core.dir/core/Game.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/core/Game.cpp -o CMakeFiles/nervous_core.dir/core/Game.cpp.s
 
+CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o: CMakeFiles/nervous_core.dir/flags.make
+CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o: /home/lino/Desktop/NervousAndroid/core/MctsAi.cpp
+CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o: CMakeFiles/nervous_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o -MF CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o.d -o CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o -c /home/lino/Desktop/NervousAndroid/core/MctsAi.cpp
+
+CMakeFiles/nervous_core.dir/core/MctsAi.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nervous_core.dir/core/MctsAi.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/NervousAndroid/core/MctsAi.cpp > CMakeFiles/nervous_core.dir/core/MctsAi.cpp.i
+
+CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/core/MctsAi.cpp -o CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s
+
 # Object files for target nervous_core
 nervous_core_OBJECTS = \
 "CMakeFiles/nervous_core.dir/core/Board.cpp.o" \
 "CMakeFiles/nervous_core.dir/core/Rules.cpp.o" \
-"CMakeFiles/nervous_core.dir/core/Game.cpp.o"
+"CMakeFiles/nervous_core.dir/core/Game.cpp.o" \
+"CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o"
 
 # External object files for target nervous_core
 nervous_core_EXTERNAL_OBJECTS =
@@ -123,9 +138,10 @@ nervous_core_EXTERNAL_OBJECTS =
 libnervous_core.a: CMakeFiles/nervous_core.dir/core/Board.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/core/Rules.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/core/Game.cpp.o
+libnervous_core.a: CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/build.make
 libnervous_core.a: CMakeFiles/nervous_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libnervous_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library libnervous_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/nervous_core.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/nervous_core.dir/link.txt --verbose=$(VERBOSE)
 
