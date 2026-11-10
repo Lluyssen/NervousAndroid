@@ -50,5 +50,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/nervous_core.dir/DependInfo.cmake"
   "CMakeFiles/test_rules.dir/DependInfo.cmake"
+  "CMakeFiles/nervous_server.dir/DependInfo.cmake"
   "CMakeFiles/nervous_game.dir/DependInfo.cmake"
   )

@@ -7,6 +7,8 @@ CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: /home/lino/Desktop/NervousAndr
   /home/lino/Desktop/NervousAndroid/core/Game.h \
   /home/lino/Desktop/NervousAndroid/core/Rules.h \
   /home/lino/Desktop/NervousAndroid/core/Types.h \
+  /home/lino/Desktop/NervousAndroid/reseau/NetClient.h \
+  /home/lino/Desktop/NervousAndroid/reseau/Protocol.h \
   /home/lino/Desktop/NervousAndroid/src/GameScreen.h \
   /home/lino/Desktop/NervousAndroid/src/MenuScreen.h \
   /usr/include/alloca.h \
@@ -33,6 +35,7 @@ CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: /home/lino/Desktop/NervousAndr
   /usr/include/c++/13/bits/cpp_type_traits.h \
   /usr/include/c++/13/bits/cxxabi_forced.h \
   /usr/include/c++/13/bits/cxxabi_init_exception.h \
+  /usr/include/c++/13/bits/deque.tcc \
   /usr/include/c++/13/bits/enable_special_members.h \
   /usr/include/c++/13/bits/exception.h \
   /usr/include/c++/13/bits/exception_defines.h \
@@ -67,6 +70,7 @@ CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: /home/lino/Desktop/NervousAndr
   /usr/include/c++/13/bits/stl_algobase.h \
   /usr/include/c++/13/bits/stl_bvector.h \
   /usr/include/c++/13/bits/stl_construct.h \
+  /usr/include/c++/13/bits/stl_deque.h \
   /usr/include/c++/13/bits/stl_function.h \
   /usr/include/c++/13/bits/stl_heap.h \
   /usr/include/c++/13/bits/stl_iterator.h \
@@ -99,6 +103,7 @@ CMakeFiles/nervous_game.dir/src/GameScreen.cpp.o: /home/lino/Desktop/NervousAndr
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
   /usr/include/c++/13/debug/debug.h \
+  /usr/include/c++/13/deque \
   /usr/include/c++/13/exception \
   /usr/include/c++/13/ext/aligned_buffer.h \
   /usr/include/c++/13/ext/alloc_traits.h \
@@ -555,6 +560,8 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
   /home/lino/Desktop/NervousAndroid/core/Game.h \
   /home/lino/Desktop/NervousAndroid/core/Rules.h \
   /home/lino/Desktop/NervousAndroid/core/Types.h \
+  /home/lino/Desktop/NervousAndroid/reseau/NetClient.h \
+  /home/lino/Desktop/NervousAndroid/reseau/Protocol.h \
   /home/lino/Desktop/NervousAndroid/src/GameScreen.h \
   /home/lino/Desktop/NervousAndroid/src/MenuScreen.h \
   /usr/include/alloca.h \
@@ -579,6 +586,7 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
   /usr/include/c++/13/bits/cpp_type_traits.h \
   /usr/include/c++/13/bits/cxxabi_forced.h \
   /usr/include/c++/13/bits/cxxabi_init_exception.h \
+  /usr/include/c++/13/bits/deque.tcc \
   /usr/include/c++/13/bits/enable_special_members.h \
   /usr/include/c++/13/bits/exception.h \
   /usr/include/c++/13/bits/exception_defines.h \
@@ -612,6 +620,7 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
   /usr/include/c++/13/bits/stl_algobase.h \
   /usr/include/c++/13/bits/stl_bvector.h \
   /usr/include/c++/13/bits/stl_construct.h \
+  /usr/include/c++/13/bits/stl_deque.h \
   /usr/include/c++/13/bits/stl_function.h \
   /usr/include/c++/13/bits/stl_iterator.h \
   /usr/include/c++/13/bits/stl_iterator_base_funcs.h \
@@ -643,6 +652,7 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
   /usr/include/c++/13/debug/debug.h \
+  /usr/include/c++/13/deque \
   /usr/include/c++/13/exception \
   /usr/include/c++/13/ext/aligned_buffer.h \
   /usr/include/c++/13/ext/alloc_traits.h \
@@ -920,9 +930,11 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/local/include/SDL3/SDL_dialog.h:
 
-/usr/include/c++/13/tr1/ell_integral.tcc:
+/usr/local/include/SDL3/SDL_clipboard.h:
 
-/usr/include/c++/13/tr1/exp_integral.tcc:
+/usr/local/include/SDL3/SDL_camera.h:
+
+/usr/local/include/SDL3/SDL_blendmode.h:
 
 /usr/include/c++/13/ratio:
 
@@ -940,10 +952,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/c++/13/bits/exception_ptr.h:
 
-/usr/include/c++/13/thread:
-
-/usr/include/c++/13/ext/type_traits.h:
-
 /usr/include/c++/13/ext/string_conversions.h:
 
 /usr/local/include/SDL3/SDL_metal.h:
@@ -957,6 +965,8 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 /usr/include/c++/13/debug/assertions.h:
 
 /usr/include/c++/13/ctime:
+
+/usr/include/c++/13/deque:
 
 /usr/include/c++/13/cstdlib:
 
@@ -1006,8 +1016,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/c++/13/bits/align.h:
 
-/usr/include/x86_64-linux-gnu/bits/waitflags.h:
-
 /usr/include/c++/13/memory:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
@@ -1042,11 +1050,33 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/c++/13/bits/stl_algobase.h:
 
-/usr/include/c++/13/tr1/bessel_function.tcc:
-
 /usr/include/c++/13/initializer_list:
 
 /usr/include/c++/13/bits/std_thread.h:
+
+/usr/include/c++/13/tr1/bessel_function.tcc:
+
+/usr/include/c++/13/bits/shared_ptr_atomic.h:
+
+/usr/include/c++/13/bits/uniform_int_dist.h:
+
+/usr/include/c++/13/bits/stringfwd.h:
+
+/usr/local/include/SDL3/SDL_version.h:
+
+/usr/include/c++/13/bits/this_thread_sleep.h:
+
+/usr/include/c++/13/bits/memory_resource.h:
+
+/usr/include/c++/13/bits/shared_ptr_base.h:
+
+/usr/include/wchar.h:
+
+/home/lino/Desktop/NervousAndroid/src/main.cpp:
+
+/usr/include/c++/13/bits/shared_ptr.h:
+
+/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
 /usr/include/c++/13/bits/atomic_lockfree_defines.h:
 
@@ -1058,11 +1088,9 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
-/usr/include/c++/13/bits/stringfwd.h:
-
-/usr/include/c++/13/bits/uniform_int_dist.h:
-
 /usr/include/c++/13/backward/binders.h:
+
+/usr/include/c++/13/bits/stl_deque.h:
 
 /usr/include/c++/13/ext/alloc_traits.h:
 
@@ -1073,8 +1101,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 /usr/include/c++/13/bits/alloc_traits.h:
 
 /usr/include/c++/13/bits/concept_check.h:
-
-/usr/local/include/SDL3/SDL_clipboard.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
@@ -1095,8 +1121,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 /usr/include/c++/13/bits/allocated_ptr.h:
 
 /usr/include/c++/13/bit:
-
-/usr/include/c++/13/bits/enable_special_members.h:
 
 /usr/include/c++/13/backward/auto_ptr.h:
 
@@ -1132,35 +1156,11 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/c++/13/bits/move.h:
 
-/usr/local/include/SDL3/SDL_blendmode.h:
+/usr/local/include/SDL3/SDL_time.h:
 
-/usr/include/c++/13/ext/aligned_buffer.h:
+/usr/include/c++/13/bits/string_view.tcc:
 
-/usr/include/locale.h:
-
-/usr/include/c++/13/bits/utility.h:
-
-/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
-
-/home/lino/Desktop/NervousAndroid/src/GameScreen.cpp:
-
-/usr/include/c++/13/iosfwd:
-
-/usr/include/c++/13/bits/predefined_ops.h:
-
-/usr/include/x86_64-linux-gnu/bits/endianness.h:
-
-/usr/include/c++/13/bits/chrono.h:
-
-/usr/local/include/SDL3/SDL_tray.h:
-
-/home/lino/Desktop/NervousAndroid/src/MenuScreen.h:
-
-/usr/include/ctype.h:
-
-/usr/include/c++/13/bits/ostream_insert.h:
-
-/usr/include/alloca.h:
+/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
 
 /usr/include/c++/13/bits/ptr_traits.h:
 
@@ -1178,15 +1178,61 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/c++/13/algorithm:
 
+/usr/include/c++/13/ext/aligned_buffer.h:
+
+/usr/include/locale.h:
+
+/usr/include/c++/13/bits/utility.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+
 /usr/include/features-time64.h:
+
+/usr/include/c++/13/bits/hash_bytes.h:
+
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /usr/include/c++/13/bits/stl_iterator_base_funcs.h:
 
 /usr/include/asm-generic/errno-base.h:
 
-/usr/include/c++/13/bits/hash_bytes.h:
+/home/lino/Desktop/NervousAndroid/src/GameScreen.cpp:
 
-/usr/include/x86_64-linux-gnu/bits/math-vector.h:
+/usr/include/c++/13/iosfwd:
+
+/usr/include/c++/13/bits/predefined_ops.h:
+
+/usr/local/include/SDL3/SDL_tray.h:
+
+/home/lino/Desktop/NervousAndroid/src/MenuScreen.h:
+
+/usr/include/ctype.h:
+
+/usr/include/c++/13/bits/ostream_insert.h:
+
+/usr/include/c++/13/bits/enable_special_members.h:
+
+/home/lino/Desktop/NervousAndroid/reseau/NetClient.h:
+
+/usr/include/alloca.h:
+
+/usr/include/x86_64-linux-gnu/bits/endianness.h:
+
+/usr/include/c++/13/bits/chrono.h:
+
+/usr/include/c++/13/ext/type_traits.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitflags.h:
+
+/home/lino/Desktop/NervousAndroid/reseau/Protocol.h:
+
+/usr/include/c++/13/bits/deque.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/endian.h:
+
+/usr/local/include/SDL3/SDL_process.h:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
 /usr/local/include/SDL3/SDL_keyboard.h:
 
@@ -1208,22 +1254,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
-/usr/local/include/SDL3/SDL_version.h:
-
-/usr/include/c++/13/bits/this_thread_sleep.h:
-
-/usr/include/c++/13/bits/memory_resource.h:
-
-/usr/include/c++/13/bits/shared_ptr_base.h:
-
-/usr/include/wchar.h:
-
-/home/lino/Desktop/NervousAndroid/src/main.cpp:
-
-/usr/include/c++/13/bits/shared_ptr.h:
-
-/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
-
 /usr/include/c++/13/bits/functional_hash.h:
 
 /usr/include/errno.h:
@@ -1242,21 +1272,23 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/c++/13/bits/stl_tempbuf.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
 /usr/include/c++/13/bits/random.h:
 
 /usr/include/x86_64-linux-gnu/sys/types.h:
-
-/usr/local/include/SDL3/SDL_time.h:
-
-/usr/include/c++/13/bits/string_view.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
 
 /usr/include/c++/13/bits/refwrap.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
-/usr/include/c++/13/bits/shared_ptr_atomic.h:
+/usr/include/c++/13/thread:
+
+/usr/include/c++/13/tr1/ell_integral.tcc:
+
+/usr/include/c++/13/tr1/exp_integral.tcc:
 
 /usr/include/c++/13/bits/range_access.h:
 
@@ -1326,12 +1358,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
 
-/usr/include/x86_64-linux-gnu/bits/endian.h:
-
-/usr/local/include/SDL3/SDL_process.h:
-
-/usr/include/x86_64-linux-gnu/gnu/stubs.h:
-
 /usr/include/c++/13/bits/requires_hosted.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
@@ -1354,13 +1380,13 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 
-/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
-
-/usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
+/usr/local/include/SDL3/SDL_close_code.h:
 
 /usr/include/x86_64-linux-gnu/bits/locale.h:
 
-/usr/local/include/SDL3/SDL_close_code.h:
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
 /usr/include/x86_64-linux-gnu/bits/sched.h:
 
@@ -1414,10 +1440,6 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
@@ -1465,5 +1487,3 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: /home/lino/Desktop/NervousAndroid/sr
 /usr/local/include/SDL3/SDL_audio.h:
 
 /usr/local/include/SDL3/SDL_bits.h:
-
-/usr/local/include/SDL3/SDL_camera.h:

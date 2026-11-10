@@ -1,5 +1,6 @@
 /home/lino/Desktop/NervousAndroid/build/CMakeFiles/nervous_core.dir
 /home/lino/Desktop/NervousAndroid/build/CMakeFiles/test_rules.dir
+/home/lino/Desktop/NervousAndroid/build/CMakeFiles/nervous_server.dir
 /home/lino/Desktop/NervousAndroid/build/CMakeFiles/nervous_game.dir
 /home/lino/Desktop/NervousAndroid/build/CMakeFiles/test.dir
 /home/lino/Desktop/NervousAndroid/build/CMakeFiles/edit_cache.dir

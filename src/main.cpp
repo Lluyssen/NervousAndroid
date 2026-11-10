@@ -2,40 +2,35 @@
 #include "MenuScreen.h"
 #include "GameScreen.h"
 
-int main() {
-    // SDL est initialisÃĐ une seule fois pour tout le programme.
+int main(int, char**) {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL_Init: %s", SDL_GetError());
         return 1;
     }
 
-    ng::GameMode mode = ng::GameMode::None;
+    ng::GameMode mode;
     {
         ng::MenuScreen menu;
-        if (!menu.init()) {
+        if (!menu.init()) { SDL_Quit(); return 1; }
+        mode = menu.run();
+    }   // le menu est dÃĐtruit ici : sa fenÃŠtre se ferme avant celle du jeu
+
+    if (mode == ng::GameMode::None) { SDL_Quit(); return 0; }
+
+    ng::GameScreen game(/*width*/ 20, /*height*/ 20);   // garde tes valeurs actuelles
+    game.setMode(mode);
+
+    if (mode == ng::GameMode::Multiplayer) {
+        if (!game.connectOnline("127.0.0.1", 5000)) {
+            SDL_Log("Connexion au serveur impossible");
             SDL_Quit();
             return 1;
         }
-        mode = menu.run();
-    }   // fenÃŠtre du menu dÃĐtruite ici
-
-    if (mode == ng::GameMode::None) {   // fenÃŠtre fermÃĐe / Echap
-        SDL_Quit();
-        return 0;
     }
 
-    int result = 0;
-    {
-        ng::GameScreen screen(/*width*/ 30, /*height*/ 30);   // tes valeurs actuelles
-        screen.setMode(mode);
-        if (!screen.init()) {
-            result = 1;
-        } else {
-            screen.run();
-        }
-    }   // fenÃŠtre du jeu dÃĐtruite ici
+    if (!game.init()) { SDL_Quit(); return 1; }
+    game.run();
 
     SDL_Quit();
-    return result;
-
+    return 0;
 }

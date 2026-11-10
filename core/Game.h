@@ -29,9 +29,7 @@ public:
     int placedThisTurn() const { return placed_; }
 
     // Fin de partie : phase GameOver, ou un joueur à 0 PV.
-    bool isOver() const {
-        return phase_ == Phase::GameOver || hp_[0] <= 0 || hp_[1] <= 0;
-    }
+    bool isOver() const { return phase_ == Phase::GameOver || hp_[0] <= 0 || hp_[1] <= 0; }
 
     // Gagnant, valable seulement si isOver() ET qu'un gagnant a été désigné.
     // Vide si la partie est nulle ou non terminée.
@@ -61,6 +59,8 @@ public:
     bool baseWouldBeReachable(const Board& candidate, Player p) const;
     std::vector<Pos> legalSquarePlacementsFor(Player p) const;
     Player winnerOrDefault() const { return winner_.value_or(Player::One); }
+
+    Player actingPlayer() const { return phase_ == Phase::RelocateBase ? relocating_ : current_; }
 
 private:
     void afterPlacementChecks();   // dégâts déjà appliqués ; vérifie enfermement + blocage

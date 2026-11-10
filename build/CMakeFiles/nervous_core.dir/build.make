@@ -125,12 +125,57 @@ CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/core/MctsAi.cpp -o CMakeFiles/nervous_core.dir/core/MctsAi.cpp.s
 
+CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o: CMakeFiles/nervous_core.dir/flags.make
+CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o: /home/lino/Desktop/NervousAndroid/reseau/Protocol.cpp
+CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o: CMakeFiles/nervous_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o -MF CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o.d -o CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o -c /home/lino/Desktop/NervousAndroid/reseau/Protocol.cpp
+
+CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/NervousAndroid/reseau/Protocol.cpp > CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.i
+
+CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/reseau/Protocol.cpp -o CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.s
+
+CMakeFiles/nervous_core.dir/reseau/Server.cpp.o: CMakeFiles/nervous_core.dir/flags.make
+CMakeFiles/nervous_core.dir/reseau/Server.cpp.o: /home/lino/Desktop/NervousAndroid/reseau/Server.cpp
+CMakeFiles/nervous_core.dir/reseau/Server.cpp.o: CMakeFiles/nervous_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/nervous_core.dir/reseau/Server.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_core.dir/reseau/Server.cpp.o -MF CMakeFiles/nervous_core.dir/reseau/Server.cpp.o.d -o CMakeFiles/nervous_core.dir/reseau/Server.cpp.o -c /home/lino/Desktop/NervousAndroid/reseau/Server.cpp
+
+CMakeFiles/nervous_core.dir/reseau/Server.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nervous_core.dir/reseau/Server.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/NervousAndroid/reseau/Server.cpp > CMakeFiles/nervous_core.dir/reseau/Server.cpp.i
+
+CMakeFiles/nervous_core.dir/reseau/Server.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_core.dir/reseau/Server.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/reseau/Server.cpp -o CMakeFiles/nervous_core.dir/reseau/Server.cpp.s
+
+CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o: CMakeFiles/nervous_core.dir/flags.make
+CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o: /home/lino/Desktop/NervousAndroid/reseau/NetClient.cpp
+CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o: CMakeFiles/nervous_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o -MF CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o.d -o CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o -c /home/lino/Desktop/NervousAndroid/reseau/NetClient.cpp
+
+CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lino/Desktop/NervousAndroid/reseau/NetClient.cpp > CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.i
+
+CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lino/Desktop/NervousAndroid/reseau/NetClient.cpp -o CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.s
+
 # Object files for target nervous_core
 nervous_core_OBJECTS = \
 "CMakeFiles/nervous_core.dir/core/Board.cpp.o" \
 "CMakeFiles/nervous_core.dir/core/Rules.cpp.o" \
 "CMakeFiles/nervous_core.dir/core/Game.cpp.o" \
-"CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o"
+"CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o" \
+"CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o" \
+"CMakeFiles/nervous_core.dir/reseau/Server.cpp.o" \
+"CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o"
 
 # External object files for target nervous_core
 nervous_core_EXTERNAL_OBJECTS =
@@ -139,9 +184,12 @@ libnervous_core.a: CMakeFiles/nervous_core.dir/core/Board.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/core/Rules.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/core/Game.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o
+libnervous_core.a: CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o
+libnervous_core.a: CMakeFiles/nervous_core.dir/reseau/Server.cpp.o
+libnervous_core.a: CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o
 libnervous_core.a: CMakeFiles/nervous_core.dir/build.make
 libnervous_core.a: CMakeFiles/nervous_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library libnervous_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lino/Desktop/NervousAndroid/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX static library libnervous_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/nervous_core.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/nervous_core.dir/link.txt --verbose=$(VERBOSE)
 

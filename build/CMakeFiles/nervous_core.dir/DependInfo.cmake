@@ -12,6 +12,9 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lino/Desktop/NervousAndroid/core/Game.cpp" "CMakeFiles/nervous_core.dir/core/Game.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Game.cpp.o.d"
   "/home/lino/Desktop/NervousAndroid/core/MctsAi.cpp" "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o.d"
   "/home/lino/Desktop/NervousAndroid/core/Rules.cpp" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/core/Rules.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/reseau/NetClient.cpp" "CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/reseau/Protocol.cpp" "CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o.d"
+  "/home/lino/Desktop/NervousAndroid/reseau/Server.cpp" "CMakeFiles/nervous_core.dir/reseau/Server.cpp.o" "gcc" "CMakeFiles/nervous_core.dir/reseau/Server.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

@@ -4,10 +4,13 @@
 #include <random>
 #include <string>
 #include <thread>
+#include <memory>
 #include <vector>
 #include "../core/Game.h"
 #include "MenuScreen.h"
 #include "MctsAi.h"
+#include "../reseau/NetClient.h"
+#include "../reseau/Protocol.h"
 
 namespace ng {
 
@@ -22,6 +25,7 @@ public:
     bool init();
     void run();
     void setMode(GameMode m);
+    bool connectOnline(const std::string& host, int port);
 
 private:
     enum class AiLevel { Easy, Hard };
@@ -34,6 +38,19 @@ private:
     GameMode mode_       = GameMode::LocalOneVsOne;
     AiLevel  aiLevel_    = AiLevel::Easy;
     Uint64   startTicks_ = 0;
+
+    // --- Reseau ---
+    std::unique_ptr<net::NetClient> net_;
+    Player  myPlayer_      = Player::One;
+    bool    gameStarted_   = false;   // faux tant que START n'est pas recu
+    bool    opponentLeft_  = false;
+    bool    connectionLost_ = false;
+
+    bool online() const { return mode_ == GameMode::Multiplayer; }
+    bool canAct() const;
+    void pollNetwork();
+    void sendClick(Pos p);
+    void sendEndTurn();
 
     bool vsComputer() const {
         return mode_ == GameMode::VsComputerEasy ||
@@ -74,6 +91,8 @@ private:
 
     bool pixelToCell(float mx, float my, Pos* out) const;
     void setMessage(const std::string& m) { message_ = m; }
+
+    void syncHp();
 
     Game game_;
     SDL_Window*   window_   = nullptr;

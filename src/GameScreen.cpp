@@ -54,6 +54,111 @@ GameScreen::~GameScreen() {
     if (window_)   SDL_DestroyWindow(window_);
 }
 
+//  Réseau
+
+bool GameScreen::connectOnline(const std::string& host, int port) {
+    net_ = std::make_unique<net::NetClient>();
+    if (!net_->connectTo(host, port)) { net_.reset(); return false; }
+    mode_ = GameMode::Multiplayer;
+
+    // Attend le WELCOME (max ~5 s) pour connaitre joueur + taille de grille.
+    const Uint64 t0 = SDL_GetTicks();
+    while (SDL_GetTicks() - t0 < 5000) {
+        if (auto m = net_->poll()) {
+            if (m->type == net::MsgType::Welcome) {
+                myPlayer_ = m->you;
+                game_ = Game(m->width, m->height);
+                return true;
+            }
+        }
+        SDL_Delay(10);
+    }
+    net_.reset();
+    return false;
+}
+
+bool GameScreen::canAct() const {
+    if (game_.isOver() || isComputerTurn()) return false;
+    if (online())
+        return gameStarted_ && !opponentLeft_ && !connectionLost_
+               && currentActor() == myPlayer_;
+    return true;
+}
+
+void GameScreen::pollNetwork() {
+    if (!net_) return;
+    while (auto m = net_->poll()) {
+        switch (m->type) {
+            case net::MsgType::Welcome:
+                break;                       // deja traite dans connectOnline
+            case net::MsgType::Start:
+                gameStarted_ = true;
+                syncHp();
+                setMessage(myPlayer_ == Player::One
+                               ? "A vous : placez votre base."
+                               : "L'adversaire place sa base.");
+                rebuildCache();
+                break;
+            case net::MsgType::ActionMsg:
+                afterStateChange(net::apply(game_, m->action));
+                break;
+            case net::MsgType::Reject:
+                setMessage(describe(m->reason));
+                break;
+            case net::MsgType::OpponentLeft:
+                if (!game_.isOver()) {
+                    opponentLeft_ = true;
+                    setMessage("L'adversaire a quitte la partie.");
+                }
+                break;
+            case net::MsgType::Disconnected:
+                connectionLost_ = true;
+                setMessage("Connexion au serveur perdue.");
+                break;
+        }
+    }
+}
+
+void GameScreen::sendClick(Pos p) {
+    if (!net_) return;
+    net::Action a;
+    a.pos = p;
+    switch (game_.phase()) {
+        case Phase::PlaceBaseP1:
+        case Phase::PlaceBaseP2:
+            a.kind = net::ActionKind::Base;
+            break;
+        case Phase::PlaySquares:
+            a.kind = net::ActionKind::Square;
+            break;
+        case Phase::RelocateBase: {
+            Pos tl;
+            a.kind = net::ActionKind::Relocate;
+            a.pos  = findLegalTl(p, &tl) ? tl : p;
+            break;
+        }
+        default:
+            return;
+    }
+    net_->send(a);
+}
+
+void GameScreen::sendEndTurn() {
+    if (!net_) return;
+    net::Action a;
+    a.kind = net::ActionKind::End;
+    net_->send(a);
+}
+
+//  Initialisation
+
+std::string GameScreen::playerName(Player pl) const {
+    if (vsComputer() && pl == Player::Two) return "Ordinateur";
+    std::string n = (pl == Player::One) ? "Joueur 1" : "Joueur 2";
+    if (online() && pl == myPlayer_) n += " (vous)";
+    return n;
+}
+
 bool GameScreen::init() {
     const Board& b = game_.board();
     cellSize_ = std::max(6, std::min(28, 900 / std::max(b.width(), b.height())));
@@ -67,20 +172,21 @@ bool GameScreen::init() {
     }
     SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
 
-    maxHp_ = std::max(1, std::max(game_.hp(Player::One), game_.hp(Player::Two)));
-    prevHp_[0] = game_.hp(Player::One);
-    prevHp_[1] = game_.hp(Player::Two);
+    syncHp();
     lastTicks_ = SDL_GetTicks();
 
     // Purge les événements hérités du menu : évite un double clic fantôme.
-    // Sans cela, un clic de validation du menu serait compté sur le plateau.
     SDL_RaiseWindow(window_);
     SDL_PumpEvents();
     SDL_FlushEvents(SDL_EVENT_FIRST, SDL_EVENT_LAST);
     startTicks_ = SDL_GetTicks();
 
     rebuildCache();
-    setMessage("J1 : placez votre base.");
+    setMessage(online() ? "Connecte. En attente d'un adversaire..."
+                        : "J1 : placez votre base.");
+
+    // Un START deja arrive pendant la creation de la fenetre est traite ici.
+    if (online()) pollNetwork();
     return true;
 }
 
@@ -89,9 +195,7 @@ void GameScreen::setMode(GameMode m) {
     aiLevel_ = (m == GameMode::VsComputerHard) ? AiLevel::Hard : AiLevel::Easy;
 }
 
-// ---------------------------------------------------------------------------
 //  Helpers d'état
-// ---------------------------------------------------------------------------
 
 // Joueur qui doit agir maintenant (tient compte du déplacement de base forcé).
 Player GameScreen::currentActor() const {
@@ -110,9 +214,7 @@ void GameScreen::afterStateChange(Result r) {
     rebuildCache();
 }
 
-// ---------------------------------------------------------------------------
 //  Intelligence artificielle
-// ---------------------------------------------------------------------------
 
 // Lance la réflexion MCTS dans un thread, sur une COPIE de la partie.
 void GameScreen::startAiThinking() {
@@ -212,15 +314,14 @@ void GameScreen::playComputerTurn() {
     else if (!aiBusy_.load()) startAiThinking();
 }
 
-// ---------------------------------------------------------------------------
 //  Boucle principale et événements
-// ---------------------------------------------------------------------------
 
 void GameScreen::run() {
     while (running_) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) handleEvent(e);
 
+        pollNetwork();
         if (isComputerTurn()) playComputerTurn();
 
         updateAnimations();
@@ -240,8 +341,12 @@ void GameScreen::handleEvent(const SDL_Event& e) {
             break;
         case SDL_EVENT_KEY_DOWN:
             if (e.key.key == SDLK_ESCAPE) running_ = false;
-            if ((e.key.key == SDLK_SPACE || e.key.key == SDLK_RETURN) && !isComputerTurn()) {
-                afterStateChange(game_.endTurn());
+            if (e.key.key == SDLK_SPACE || e.key.key == SDLK_RETURN) {
+                if (online()) pollNetwork();      // état à jour avant de décider
+                if (canAct()) {
+                    if (online()) sendEndTurn();
+                    else afterStateChange(game_.endTurn());
+                }
             }
             break;
         default:
@@ -317,10 +422,18 @@ bool GameScreen::findLegalTl(Pos click, Pos* out) const {
 
 void GameScreen::handleClick(float mx, float my) {
     if (SDL_GetTicks() - startTicks_ < 250) return;
+
+    // Etat reseau a jour avant de decider : evite le "double clic" du joueur 2
+    // quand le START arrive juste avant le clic.
+    if (online()) pollNetwork();
+
     if (game_.isOver() || isComputerTurn()) return;
+    if (!canAct()) return;
 
     Pos p;
     if (!pixelToCell(mx, my, &p)) return;
+
+    if (online()) { sendClick(p); return; }   // le serveur renvoie ACTION
 
     Result r = Result::WrongPhase;
     switch (game_.phase()) {
@@ -342,9 +455,7 @@ void GameScreen::handleClick(float mx, float my) {
     afterStateChange(r);
 }
 
-// ---------------------------------------------------------------------------
 //  Primitives de dessin
-// ---------------------------------------------------------------------------
 
 void GameScreen::drawRoundedRect(float x, float y, float w, float h, float radius) {
     radius = std::min(radius, std::min(w, h) * 0.5f);
@@ -373,11 +484,6 @@ void GameScreen::drawText(float x, float y, const std::string& s, float scale) {
     SDL_SetRenderScale(renderer_, 1.f, 1.f);
 }
 
-std::string GameScreen::playerName(Player pl) const {
-    if (vsComputer() && pl == Player::Two) return "Ordinateur";
-    return pl == Player::One ? "Joueur 1" : "Joueur 2";
-}
-
 void GameScreen::updateAnimations() {
     const Uint64 now = SDL_GetTicks();
     const float dt = static_cast<float>(now - lastTicks_) / 1000.f;
@@ -393,9 +499,7 @@ void GameScreen::updateAnimations() {
     }
 }
 
-// ---------------------------------------------------------------------------
 //  Plateau
-// ---------------------------------------------------------------------------
 
 void GameScreen::drawGrid() {
     const Board& b = game_.board();
@@ -431,7 +535,7 @@ void GameScreen::drawGrid() {
 
 void GameScreen::drawHighlights() {
     if (game_.phase() == Phase::GameOver) return;
-    if (isComputerTurn()) return;
+    if (!canAct()) return;
 
     const Board& b = game_.board();
     const int W = b.width(), H = b.height();
@@ -492,9 +596,14 @@ void GameScreen::drawHighlights() {
     }
 }
 
-// ---------------------------------------------------------------------------
 //  HUD
-// ---------------------------------------------------------------------------
+
+void GameScreen::syncHp() {
+    maxHp_ = std::max(1, std::max(game_.hp(Player::One), game_.hp(Player::Two)));
+    prevHp_[0] = game_.hp(Player::One);
+    prevHp_[1] = game_.hp(Player::Two);
+    lostFlash_[0] = lostFlash_[1] = 0.f;
+}
 
 void GameScreen::drawPlayerCard(Player pl, float x, float y, float w, float h) {
     const int idx = (pl == Player::One) ? 0 : 1;
@@ -511,18 +620,26 @@ void GameScreen::drawPlayerCard(Player pl, float x, float y, float w, float h) {
         SDL_RenderRect(renderer_, &o);
     }
 
+    // Pastille + nom (échelle 1.5 : tient dans la carte, même avec "(vous)").
     setColor(renderer_, pc);
     drawRoundedRect(x + 14, y + (h - 14.f) * 0.5f, 14.f, 14.f, 7.f);
     setColor(renderer_, kText);
-    drawText(x + 38, y + (h - 16.f) * 0.5f, playerName(pl), 2.0f);
+    drawText(x + 38, y + (h - 12.f) * 0.5f, playerName(pl), 1.5f);
 
-    // PV : un carré par point de vie.
+    // PV : un carré par point de vie, taille adaptée à la place restante.
     const int hp = game_.hp(pl);
     const int total = std::max(1, maxHp_);
-    const float gap = 6.f;
-    const float box = std::min(20.f, h - 20.f);
-    const float rowW = total * box + (total - 1) * gap;
     const float counterW = 50.f;
+    const float gap = 4.f;
+
+    // Zone PV = 55 % de la carte, a droite, a cote du compteur.
+    const float zoneW = w * 0.55f - counterW - 14.f;
+    float box = std::min(20.f, h - 20.f);
+    const float needed = total * box + (total - 1) * gap;
+    if (needed > zoneW)
+        box = std::max(6.f, (zoneW - (total - 1) * gap) / total);
+
+    const float rowW = total * box + (total - 1) * gap;
     const float bx = x + w - 14.f - counterW - rowW;
     const float by = y + (h - box) * 0.5f;
 
@@ -561,7 +678,13 @@ void GameScreen::drawStatusBar(float w) {
     const Rgba accent = game_.isOver() ? kGood : playerColor(cur);
 
     std::string phase;
-    if (game_.isOver()) {
+    if (online() && connectionLost_) {
+        phase = "Connexion perdue";
+    } else if (online() && !gameStarted_) {
+        phase = "En attente d'un adversaire...";
+    } else if (online() && opponentLeft_) {
+        phase = "Adversaire deconnecte";
+    } else if (game_.isOver()) {
         phase = "Partie terminee";
     } else {
         const bool computerTurn = isComputerTurn();
@@ -579,7 +702,11 @@ void GameScreen::drawStatusBar(float w) {
                 break;
             default: break;
         }
-        phase = "Tour de " + playerName(cur) + "  |  " + phase;
+        if (online())
+            phase = (cur == myPlayer_ ? "A vous de jouer" : "Tour de l'adversaire")
+                    + std::string("  |  ") + phase;
+        else
+            phase = "Tour de " + playerName(cur) + "  |  " + phase;
     }
 
     const float textScale = 1.5f;

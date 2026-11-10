@@ -153,6 +153,19 @@ test_rules/fast:
 .PHONY : test_rules/fast
 
 #=============================================================================
+# Target rules for targets named nervous_server
+
+# Build rule for target.
+nervous_server: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 nervous_server
+.PHONY : nervous_server
+
+# fast build rule for target.
+nervous_server/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_server.dir/build.make CMakeFiles/nervous_server.dir/build
+.PHONY : nervous_server/fast
+
+#=============================================================================
 # Target rules for targets named nervous_game
 
 # Build rule for target.
@@ -261,6 +274,81 @@ core/Rules.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/core/Rules.cpp.s
 .PHONY : core/Rules.cpp.s
 
+reseau/NetClient.o: reseau/NetClient.cpp.o
+.PHONY : reseau/NetClient.o
+
+# target to build an object file
+reseau/NetClient.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o
+.PHONY : reseau/NetClient.cpp.o
+
+reseau/NetClient.i: reseau/NetClient.cpp.i
+.PHONY : reseau/NetClient.i
+
+# target to preprocess a source file
+reseau/NetClient.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.i
+.PHONY : reseau/NetClient.cpp.i
+
+reseau/NetClient.s: reseau/NetClient.cpp.s
+.PHONY : reseau/NetClient.s
+
+# target to generate assembly for a file
+reseau/NetClient.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.s
+.PHONY : reseau/NetClient.cpp.s
+
+reseau/Protocol.o: reseau/Protocol.cpp.o
+.PHONY : reseau/Protocol.o
+
+# target to build an object file
+reseau/Protocol.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o
+.PHONY : reseau/Protocol.cpp.o
+
+reseau/Protocol.i: reseau/Protocol.cpp.i
+.PHONY : reseau/Protocol.i
+
+# target to preprocess a source file
+reseau/Protocol.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.i
+.PHONY : reseau/Protocol.cpp.i
+
+reseau/Protocol.s: reseau/Protocol.cpp.s
+.PHONY : reseau/Protocol.s
+
+# target to generate assembly for a file
+reseau/Protocol.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.s
+.PHONY : reseau/Protocol.cpp.s
+
+reseau/Server.o: reseau/Server.cpp.o
+.PHONY : reseau/Server.o
+
+# target to build an object file
+reseau/Server.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/Server.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_server.dir/build.make CMakeFiles/nervous_server.dir/reseau/Server.cpp.o
+.PHONY : reseau/Server.cpp.o
+
+reseau/Server.i: reseau/Server.cpp.i
+.PHONY : reseau/Server.i
+
+# target to preprocess a source file
+reseau/Server.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/Server.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_server.dir/build.make CMakeFiles/nervous_server.dir/reseau/Server.cpp.i
+.PHONY : reseau/Server.cpp.i
+
+reseau/Server.s: reseau/Server.cpp.s
+.PHONY : reseau/Server.s
+
+# target to generate assembly for a file
+reseau/Server.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_core.dir/build.make CMakeFiles/nervous_core.dir/reseau/Server.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_server.dir/build.make CMakeFiles/nervous_server.dir/reseau/Server.cpp.s
+.PHONY : reseau/Server.cpp.s
+
 src/GameScreen.o: src/GameScreen.cpp.o
 .PHONY : src/GameScreen.o
 
@@ -368,6 +456,7 @@ help:
 	@echo "... test"
 	@echo "... nervous_core"
 	@echo "... nervous_game"
+	@echo "... nervous_server"
 	@echo "... test_rules"
 	@echo "... core/Board.o"
 	@echo "... core/Board.i"
@@ -381,6 +470,15 @@ help:
 	@echo "... core/Rules.o"
 	@echo "... core/Rules.i"
 	@echo "... core/Rules.s"
+	@echo "... reseau/NetClient.o"
+	@echo "... reseau/NetClient.i"
+	@echo "... reseau/NetClient.s"
+	@echo "... reseau/Protocol.o"
+	@echo "... reseau/Protocol.i"
+	@echo "... reseau/Protocol.s"
+	@echo "... reseau/Server.o"
+	@echo "... reseau/Server.i"
+	@echo "... reseau/Server.s"
 	@echo "... src/GameScreen.o"
 	@echo "... src/GameScreen.i"
 	@echo "... src/GameScreen.s"

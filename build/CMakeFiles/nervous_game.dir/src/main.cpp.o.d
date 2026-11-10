@@ -220,26 +220,30 @@ CMakeFiles/nervous_game.dir/src/main.cpp.o: \
  /usr/include/c++/13/bits/this_thread_sleep.h \
  /usr/include/c++/13/bits/chrono.h /usr/include/c++/13/ratio \
  /usr/include/c++/13/ctime /usr/include/c++/13/bits/parse_numbers.h \
- /home/lino/Desktop/NervousAndroid/src/../core/Game.h \
- /usr/include/c++/13/optional /usr/include/c++/13/exception \
- /usr/include/c++/13/bits/exception_ptr.h \
- /usr/include/c++/13/bits/cxxabi_init_exception.h \
- /usr/include/c++/13/typeinfo /usr/include/c++/13/bits/nested_exception.h \
- /usr/include/c++/13/bits/enable_special_members.h \
- /home/lino/Desktop/NervousAndroid/src/../core/Board.h \
- /home/lino/Desktop/NervousAndroid/src/../core/Types.h \
- /home/lino/Desktop/NervousAndroid/src/../core/Rules.h \
- /home/lino/Desktop/NervousAndroid/core/MctsAi.h \
  /usr/include/c++/13/memory /usr/include/c++/13/bits/stl_tempbuf.h \
  /usr/include/c++/13/bits/stl_raw_storage_iter.h \
  /usr/include/c++/13/bits/align.h /usr/include/c++/13/bits/shared_ptr.h \
- /usr/include/c++/13/bits/shared_ptr_base.h \
+ /usr/include/c++/13/bits/shared_ptr_base.h /usr/include/c++/13/typeinfo \
  /usr/include/c++/13/bits/allocated_ptr.h \
  /usr/include/c++/13/ext/aligned_buffer.h \
  /usr/include/c++/13/ext/atomicity.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h \
  /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
- /usr/include/c++/13/ext/concurrence.h \
+ /usr/include/c++/13/ext/concurrence.h /usr/include/c++/13/exception \
+ /usr/include/c++/13/bits/exception_ptr.h \
+ /usr/include/c++/13/bits/cxxabi_init_exception.h \
+ /usr/include/c++/13/bits/nested_exception.h \
  /usr/include/c++/13/bits/shared_ptr_atomic.h \
  /usr/include/c++/13/backward/auto_ptr.h \
- /usr/include/c++/13/pstl/glue_memory_defs.h
+ /usr/include/c++/13/pstl/glue_memory_defs.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Game.h \
+ /usr/include/c++/13/optional \
+ /usr/include/c++/13/bits/enable_special_members.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Board.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Types.h \
+ /home/lino/Desktop/NervousAndroid/src/../core/Rules.h \
+ /home/lino/Desktop/NervousAndroid/core/MctsAi.h \
+ /home/lino/Desktop/NervousAndroid/src/../reseau/NetClient.h \
+ /usr/include/c++/13/deque /usr/include/c++/13/bits/stl_deque.h \
+ /usr/include/c++/13/bits/deque.tcc \
+ /home/lino/Desktop/NervousAndroid/src/../reseau/Protocol.h

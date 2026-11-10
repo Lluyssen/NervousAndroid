@@ -7,6 +7,12 @@ file(REMOVE_RECURSE
   "CMakeFiles/nervous_core.dir/core/MctsAi.cpp.o.d"
   "CMakeFiles/nervous_core.dir/core/Rules.cpp.o"
   "CMakeFiles/nervous_core.dir/core/Rules.cpp.o.d"
+  "CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o"
+  "CMakeFiles/nervous_core.dir/reseau/NetClient.cpp.o.d"
+  "CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o"
+  "CMakeFiles/nervous_core.dir/reseau/Protocol.cpp.o.d"
+  "CMakeFiles/nervous_core.dir/reseau/Server.cpp.o"
+  "CMakeFiles/nervous_core.dir/reseau/Server.cpp.o.d"
   "libnervous_core.a"
   "libnervous_core.pdb"
 )
