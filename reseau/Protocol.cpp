@@ -87,6 +87,9 @@ std::string encode(const ServerMsg& m) {
             break;
         case MsgType::Disconnected:
             break;
+        case MsgType::OpponentBack:
+            o << "OPPONENT_BACK";
+            break;
     }
     return o.str();
 }
@@ -98,14 +101,21 @@ std::optional<ServerMsg> decodeServerMsg(const std::string& line) {
 
     ServerMsg m;
     if (word == "WELCOME") {
-        int n;
-        if (!(in >> n >> m.width >> m.height)) return std::nullopt;
-        auto p = parsePlayer(n);
-        if (!p) return std::nullopt;
-        m.type = MsgType::Welcome;
-        m.you = *p;
-        return m;
-    }
+    int n;
+    if (!(in >> n >> m.width >> m.height)) return std::nullopt;
+    int resumed = 0;
+    in >> resumed;                       // optionnel : absent = 0
+    auto p = parsePlayer(n);
+    if (!p) return std::nullopt;
+    m.type = MsgType::Welcome;
+    m.you = *p;
+    m.resumed = (resumed != 0);
+    return m;
+}
+if (word == "OPPONENT_BACK") {
+    m.type = MsgType::OpponentBack;
+    return m;
+}
     if (word == "START") {
         m.type = MsgType::Start;
         return m;

@@ -56,7 +56,35 @@ GameScreen::~GameScreen() {
 
 //  Réseau
 
+void GameScreen::tryReconnect() {
+    const Uint64 now = SDL_GetTicks();
+    if (now < nextRetryTicks_) return;
+    nextRetryTicks_ = now + std::min<Uint64>(5000, 1000 * (retryCount_ + 1));
+    ++retryCount_;
+
+    auto fresh = std::make_unique<net::NetClient>();
+    if (!fresh->connectTo(host_, port_)) {
+        setMessage("Reconnexion... (essai " + std::to_string(retryCount_) + ")");
+        return;
+    }
+
+    // On repart d'une partie vierge : le serveur va rejouer l'historique.
+    const Board& b = game_.board();
+    game_ = Game(b.width(), b.height());
+    syncHp();
+    rebuildCache();
+
+    net_ = std::move(fresh);
+    connectionLost_ = false;
+    gameStarted_    = false;
+    opponentLeft_   = false;
+    replaying_      = true;
+    retryCount_     = 0;
+    setMessage("Reconnecte, resynchronisation...");
+}
+
 bool GameScreen::connectOnline(const std::string& host, int port) {
+    host_ = host; port_ = port;
     net_ = std::make_unique<net::NetClient>();
     if (!net_->connectTo(host, port)) { net_.reset(); return false; }
     mode_ = GameMode::Multiplayer;
@@ -80,7 +108,7 @@ bool GameScreen::connectOnline(const std::string& host, int port) {
 bool GameScreen::canAct() const {
     if (game_.isOver() || isComputerTurn()) return false;
     if (online())
-        return gameStarted_ && !opponentLeft_ && !connectionLost_
+        return gameStarted_ && !opponentLeft_ && !connectionLost_ && !replaying_
                && currentActor() == myPlayer_;
     return true;
 }
@@ -90,17 +118,31 @@ void GameScreen::pollNetwork() {
     while (auto m = net_->poll()) {
         switch (m->type) {
             case net::MsgType::Welcome:
-                break;                       // deja traite dans connectOnline
-            case net::MsgType::Start:
+                if (replaying_) {
+                    // Reprise : on part d'un etat vierge, les ACTION suivent.
+                    myPlayer_ = m->you;
+                    game_ = Game(m->width, m->height);
+                    syncHp();
+                    rebuildCache();
+                }
+                break;   // sinon deja traite dans connectOnline
+            case net::MsgType::Start: {
+                const bool wasReplay = replaying_;
                 gameStarted_ = true;
+                replaying_   = false;
                 syncHp();
-                setMessage(myPlayer_ == Player::One
-                               ? "A vous : placez votre base."
-                               : "L'adversaire place sa base.");
+                if (wasReplay)
+                    setMessage("Partie reprise.");
+                else
+                    setMessage(myPlayer_ == Player::One
+                                   ? "A vous : placez votre base."
+                                   : "L'adversaire place sa base.");
                 rebuildCache();
                 break;
+            }
             case net::MsgType::ActionMsg:
                 afterStateChange(net::apply(game_, m->action));
+                if (replaying_) syncHp();   // evite un faux flash de PV perdu
                 break;
             case net::MsgType::Reject:
                 setMessage(describe(m->reason));
@@ -108,12 +150,20 @@ void GameScreen::pollNetwork() {
             case net::MsgType::OpponentLeft:
                 if (!game_.isOver()) {
                     opponentLeft_ = true;
-                    setMessage("L'adversaire a quitte la partie.");
+                    setMessage("L'adversaire a quitte, attente de son retour...");
                 }
+                break;
+            case net::MsgType::OpponentBack:
+                opponentLeft_ = false;
+                setMessage("L'adversaire est revenu.");
                 break;
             case net::MsgType::Disconnected:
                 connectionLost_ = true;
-                setMessage("Connexion au serveur perdue.");
+                gameStarted_    = false;
+                replaying_      = false;
+                nextRetryTicks_ = 0;
+                retryCount_     = 0;
+                setMessage("Connexion perdue. Reconnexion...");
                 break;
         }
     }
@@ -321,9 +371,10 @@ void GameScreen::run() {
         SDL_Event e;
         while (SDL_PollEvent(&e)) handleEvent(e);
 
-        pollNetwork();
-        if (isComputerTurn()) playComputerTurn();
+        if (online() && connectionLost_ && !game_.isOver()) tryReconnect();
+        else pollNetwork();
 
+        if (isComputerTurn()) playComputerTurn();
         updateAnimations();
         render();
         SDL_Delay(16);
@@ -680,6 +731,8 @@ void GameScreen::drawStatusBar(float w) {
     std::string phase;
     if (online() && connectionLost_) {
         phase = "Connexion perdue";
+    } else if (online() && replaying_) {
+    phase = "Resynchronisation...";
     } else if (online() && !gameStarted_) {
         phase = "En attente d'un adversaire...";
     } else if (online() && opponentLeft_) {

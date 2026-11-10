@@ -12,7 +12,7 @@ struct Action {
     Pos pos{0, 0};            // ignore pour End
 };
 
-enum class MsgType { Welcome, Start, ActionMsg, Reject, OpponentLeft, Disconnected };
+enum class MsgType { Welcome, Start, ActionMsg, Reject, OpponentLeft, Disconnected, OpponentBack };
 
 struct ServerMsg {
     MsgType type = MsgType::Start;
@@ -24,6 +24,7 @@ struct ServerMsg {
     Action action;
     // Reject
     Result reason = Result::Ok;
+    bool resumed = false;
 };
 
 // Client -> serveur

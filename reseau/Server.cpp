@@ -7,16 +7,21 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 using namespace ng;
 using namespace ng::net;
 
 namespace {
+
+using Clock = std::chrono::steady_clock;
+constexpr int kGraceSeconds = 60;   // delai avant abandon definitif
 
 struct Client {
     int fd = -1;
@@ -84,32 +89,44 @@ int main(int argc, char** argv) {
     Client clients[2];
     bool started = false;
 
+    // Historique des actions validees : sert a rejouer la partie a un
+    // client qui se reconnecte.
+    struct Played { Player who; Action act; };
+    std::vector<Played> history;
+
+    // Instant de depart du decompte d'abandon (siege vide pendant une partie).
+    bool graceActive = false;
+    Clock::time_point graceStart;
+
     auto resetGame = [&] {
         game = std::make_unique<Game>(w, h);
         started = false;
+        history.clear();
+        graceActive = false;
+    };
+
+    auto sendReject = [&](int idx, Result r) {
+        ServerMsg rej; rej.type = MsgType::Reject; rej.reason = r;
+        sendLine(clients[idx], encode(rej));
     };
 
     // Traite une ligne recue du joueur 'idx' (0 ou 1).
     auto handleLine = [&](int idx, const std::string& line) {
         Player who = idx == 0 ? Player::One : Player::Two;
         auto act = decodeAction(line);
-        if (!act) {
-            ServerMsg rej; rej.type = MsgType::Reject; rej.reason = Result::WrongPhase;
-            sendLine(clients[idx], encode(rej));
-            return;
-        }
-        if (!started || game->isOver() || game->actingPlayer() != who) {
-            ServerMsg rej; rej.type = MsgType::Reject; rej.reason = Result::WrongPhase;
-            sendLine(clients[idx], encode(rej));
+        if (!act) { sendReject(idx, Result::WrongPhase); return; }
+
+        // Partie en pause si un siege est vide : on refuse de jouer.
+        const bool bothHere = clients[0].connected() && clients[1].connected();
+        if (!started || !bothHere || game->isOver() || game->actingPlayer() != who) {
+            sendReject(idx, Result::WrongPhase);
             return;
         }
 
         Result r = apply(*game, *act);
-        if (r != Result::Ok) {
-            ServerMsg rej; rej.type = MsgType::Reject; rej.reason = r;
-            sendLine(clients[idx], encode(rej));
-            return;
-        }
+        if (r != Result::Ok) { sendReject(idx, r); return; }
+
+        history.push_back({who, *act});
 
         ServerMsg out;
         out.type = MsgType::ActionMsg;
@@ -126,7 +143,25 @@ int main(int argc, char** argv) {
         fds[1] = {clients[0].fd, POLLIN, 0};   // fd = -1 est ignore par poll
         fds[2] = {clients[1].fd, POLLIN, 0};
 
-        if (::poll(fds, 3, -1) < 0) { std::perror("poll"); break; }
+        // Timeout court pour verifier le delai d'abandon.
+        if (::poll(fds, 3, 500) < 0) { std::perror("poll"); break; }
+
+        // Delai d'abandon ecoule ?
+        if (graceActive) {
+            auto waited = std::chrono::duration_cast<std::chrono::seconds>(
+                              Clock::now() - graceStart).count();
+            if (waited >= kGraceSeconds) {
+                std::cout << "Delai de reconnexion ecoule : partie abandonnee\n";
+                // Le joueur reste connecte est informe puis remis a zero.
+                for (int i = 0; i < 2; ++i) {
+                    if (clients[i].connected()) {
+                        ServerMsg left; left.type = MsgType::OpponentLeft;
+                        sendLine(clients[i], encode(left));
+                    }
+                }
+                resetGame();
+            }
+        }
 
         // Nouvelle connexion
         if (fds[0].revents & POLLIN) {
@@ -138,15 +173,39 @@ int main(int argc, char** argv) {
                 } else {
                     clients[slot].fd = cfd;
                     clients[slot].inbuf.clear();
+                    const int other = 1 - slot;
+
+                    // Reprise : une partie est en cours (started) et ce siege
+                    // etait vide -> on rejoue l'historique.
+                    const bool resume = started;
 
                     ServerMsg wm;
                     wm.type = MsgType::Welcome;
                     wm.you = slot == 0 ? Player::One : Player::Two;
                     wm.width = w; wm.height = h;
+                    wm.resumed = resume;
                     sendLine(clients[slot], encode(wm));
-                    std::cout << "Joueur " << (slot + 1) << " connecte\n";
+                    std::cout << "Joueur " << (slot + 1)
+                              << (resume ? " reconnecte\n" : " connecte\n");
 
-                    if (clients[0].connected() && clients[1].connected() && !started) {
+                    if (resume) {
+                        // Rejeu de tout l'historique, dans l'ordre.
+                        for (const auto& p : history) {
+                            ServerMsg am;
+                            am.type = MsgType::ActionMsg;
+                            am.actor = p.who;
+                            am.action = p.act;
+                            sendLine(clients[slot], encode(am));
+                        }
+                        ServerMsg st; st.type = MsgType::Start;
+                        sendLine(clients[slot], encode(st));
+
+                        if (clients[other].connected()) {
+                            ServerMsg back; back.type = MsgType::OpponentBack;
+                            sendLine(clients[other], encode(back));
+                        }
+                        graceActive = false;   // les deux sont de nouveau la
+                    } else if (clients[0].connected() && clients[1].connected()) {
                         started = true;
                         ServerMsg st; st.type = MsgType::Start;
                         sendLine(clients[0], encode(st));
@@ -167,12 +226,24 @@ int main(int argc, char** argv) {
             if (n <= 0) {
                 std::cout << "Joueur " << (i + 1) << " deconnecte\n";
                 closeClient(clients[i]);
-                int other = 1 - i;
+                const int other = 1 - i;
+
                 if (clients[other].connected()) {
                     ServerMsg left; left.type = MsgType::OpponentLeft;
                     sendLine(clients[other], encode(left));
                 }
-                resetGame();   // la partie en cours est abandonnee
+
+                if (started && !game->isOver()) {
+                    // Partie en cours : on la garde et on attend le retour.
+                    if (!graceActive) {
+                        graceActive = true;
+                        graceStart = Clock::now();
+                    }
+                } else if (!clients[other].connected()) {
+                    resetGame();   // personne : on repart de zero
+                } else {
+                    resetGame();   // partie finie ou pas commencee
+                }
                 continue;
             }
 
@@ -187,6 +258,11 @@ int main(int argc, char** argv) {
                 if (!line.empty() && line.back() == '\r') line.pop_back();
                 handleLine(i, line);
             }
+        }
+
+        // Les deux joueurs absents pendant une partie : on abandonne tout de suite.
+        if (started && !clients[0].connected() && !clients[1].connected()) {
+            // On laisse tourner le decompte : si personne ne revient, reset.
         }
     }
 

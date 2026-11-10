@@ -118,6 +118,13 @@ private:
     void updateAnimations();
     std::string playerName(Player pl) const;
     void drawMessageToast();
+
+    std::string host_;
+int         port_ = 0;
+Uint64      nextRetryTicks_ = 0;
+int         retryCount_ = 0;
+bool        replaying_ = false;
+void tryReconnect();
 };
 
 }  // namespace ng
