@@ -4,7 +4,8 @@
 
 namespace ng {
 
-enum class GameMode { None, VsComputerEasy, VsComputerHard, LocalOneVsOne, Multiplayer, LoadSave };
+enum class GameMode { None, VsComputerEasy, VsComputerHard, LocalOneVsOne,
+                      Host, Join, LoadSave };
 
 class MenuScreen {
 public:
@@ -13,24 +14,27 @@ public:
 
     bool init();
     GameMode run();
+    bool wantsLoad() const { return loadRequested_; }
 
 private:
-    static constexpr int kButtonCount = 4;   // taille max du tableau
+    static constexpr int kButtonCount = 4;
 
     struct Button {
         float x = 0, y = 0, w = 0, h = 0;
         std::string label;
         std::string sub;
         GameMode mode = GameMode::None;
-        bool opensSubmenu = false;           // vrai pour le bouton "Ordinateur"
+        int  goPage = -1;        // page a ouvrir, -1 = bouton final
+        bool isBack = false;
+        bool isLoad = false;
     };
 
-    enum class Page { Main, Computer };
+    enum class Page { Main, Offline, Computer, Online, NewOrLoad };
     Page page_        = Page::Main;
-    int  buttonCount_ = 3;                   // nombre de boutons de la page courante
+    int  buttonCount_ = 0;
 
-    void showPage(Page p);                   // remplace layout()
-    void activate(int i);                    // clic / Entree sur un bouton
+    void showPage(Page p);
+    void activate(int i);
     int  buttonAt(float mx, float my) const;
     void handleEvent(const SDL_Event& e);
     void render();
@@ -45,6 +49,9 @@ private:
     int      hover_    = -1;
     bool     running_  = true;
     GameMode choice_   = GameMode::None;
+
+    GameMode pendingMode_   = GameMode::None;   // LocalOneVsOne ou Host
+    bool     loadRequested_ = false;
 
     Uint64 lastTicks_ = 0;
     float  time_      = 0.f;

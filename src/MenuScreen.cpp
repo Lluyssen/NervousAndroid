@@ -42,38 +42,60 @@ void MenuScreen::showPage(Page p) {
     page_ = p;
     selected_ = 0;
     hover_ = -1;
+    buttonCount_ = 0;
 
     const float bw = 400.f, bh = 78.f, gap = 18.f;
     const float x = (kWinW - bw) / 2.f;
     float y = 190.f;
 
-    if (p == Page::Main) {
-    buttonCount_ = 0;
-    if (std::ifstream("save.txt").good()) {
-        buttons_[buttonCount_++] = {x, y, bw, bh, "Continuer", "Reprendre la partie",
-                                    GameMode::LoadSave, false};
-        y += bh + gap;
-    }
-    buttons_[buttonCount_++] = {x, y, bw, bh, "Ordinateur", "Jouer contre l'IA",
-                                GameMode::None, true};
-    y += bh + gap;
-    buttons_[buttonCount_++] = {x, y, bw, bh, "1 contre 1", "Deux joueurs, meme ecran",
-                                GameMode::LocalOneVsOne, false};
-    y += bh + gap;
-    buttons_[buttonCount_++] = {x, y, bw, bh, "Multijoueur", "Jouer en reseau",
-                                GameMode::Multiplayer, false};
-} else {
-        buttons_[0] = {x, y, bw, bh, "Ordinateur simplet", "IA facile",
-                       GameMode::VsComputerEasy, false};
-        y += bh + gap;
-        buttons_[1] = {x, y, bw, bh, "Ordinateur expert", "IA qui anticipe",
-                       GameMode::VsComputerHard, false};
-        y += bh + gap + 10.f;
-        // Bouton retour : plus petit, centre.
-        const float rw = 200.f, rh = 50.f;
-        buttons_[2] = {(kWinW - rw) / 2.f, y, rw, rh, "< Retour", "",
-                       GameMode::None, false};
-        buttonCount_ = 3;
+    auto add = [&](const char* label, const char* sub, GameMode m, int go,
+                   bool back = false, bool load = false) {
+        Button b;
+        b.label = label;
+        b.sub = sub;
+        b.mode = m;
+        b.goPage = go;
+        b.isBack = back;
+        b.isLoad = load;
+        if (back) {
+            const float rw = 200.f, rh = 50.f;
+            y += 10.f;
+            b.x = (kWinW - rw) / 2.f; b.y = y; b.w = rw; b.h = rh;
+        } else {
+            b.x = x; b.y = y; b.w = bw; b.h = bh;
+            y += bh + gap;
+        }
+        buttons_[buttonCount_++] = b;
+    };
+    auto P = [](Page q) { return static_cast<int>(q); };
+
+    switch (p) {
+    case Page::Main:
+        add("Offline", "Jouer sur cet ordinateur", GameMode::None, P(Page::Offline));
+        add("Online",  "Jouer en reseau",          GameMode::None, P(Page::Online));
+        break;
+    case Page::Offline:
+        add("1 contre 1", "Deux joueurs, meme ecran", GameMode::None, P(Page::NewOrLoad));
+        add("Ordinateur", "Jouer contre l'IA",        GameMode::None, P(Page::Computer));
+        add("< Retour", "", GameMode::None, P(Page::Main), true);
+        break;
+    case Page::Computer:
+        add("Ordinateur simplet", "IA facile",       GameMode::VsComputerEasy, -1);
+        add("Ordinateur expert",  "IA qui anticipe", GameMode::VsComputerHard, -1);
+        add("< Retour", "", GameMode::None, P(Page::Offline), true);
+        break;
+    case Page::Online:
+        add("Heberger",  "Creer la partie",        GameMode::None, P(Page::NewOrLoad));
+        add("Rejoindre", "Se connecter a un hote", GameMode::Join, -1);
+        add("< Retour", "", GameMode::None, P(Page::Main), true);
+        break;
+    case Page::NewOrLoad:
+        add("Nouvelle partie", "Repartir de zero", pendingMode_, -1);
+        if (std::ifstream("save.txt").good())
+            add("Charger", "Reprendre la partie", pendingMode_, -1, false, true);
+        add("< Retour", "", GameMode::None,
+            P(pendingMode_ == GameMode::Host ? Page::Online : Page::Offline), true);
+        break;
     }
 }
 
@@ -87,21 +109,26 @@ int MenuScreen::buttonAt(float mx, float my) const {
 
 void MenuScreen::activate(int i) {
     if (i < 0 || i >= buttonCount_) return;
-    const Button& b = buttons_[i];
+    const Button b = buttons_[i];   // copie : showPage() reecrit le tableau
 
-    if (b.opensSubmenu) {
-        showPage(Page::Computer);
-    } else if (b.mode == GameMode::None) {
-        showPage(Page::Main);          // bouton Retour
-    } else {
-        choice_ = b.mode;
-        running_ = false;
+    if (b.goPage >= 0) {
+        // Entree dans NewOrLoad : on retient le mode selon la page d'origine.
+        if (static_cast<Page>(b.goPage) == Page::NewOrLoad)
+            pendingMode_ = (page_ == Page::Online) ? GameMode::Host
+                                                   : GameMode::LocalOneVsOne;
+        showPage(static_cast<Page>(b.goPage));
+        return;
     }
+    // Bouton final : lance la partie.
+    choice_ = b.mode;
+    loadRequested_ = b.isLoad;
+    running_ = false;
 }
 
 void MenuScreen::handleEvent(const SDL_Event& e) {
     switch (e.type) {
         case SDL_EVENT_QUIT:
+            choice_ = GameMode::None;
             running_ = false;
             break;
         case SDL_EVENT_MOUSE_MOTION: {
@@ -116,8 +143,23 @@ void MenuScreen::handleEvent(const SDL_Event& e) {
             break;
         case SDL_EVENT_KEY_DOWN:
             if (e.key.key == SDLK_ESCAPE) {
-                if (page_ == Page::Computer) showPage(Page::Main);
-                else running_ = false;
+                switch (page_) {
+                    case Page::Main:
+                        choice_ = GameMode::None;
+                        running_ = false;
+                        break;
+                    case Page::Offline:
+                    case Page::Online:
+                        showPage(Page::Main);
+                        break;
+                    case Page::Computer:
+                        showPage(Page::Offline);
+                        break;
+                    case Page::NewOrLoad:
+                        showPage(pendingMode_ == GameMode::Host ? Page::Online
+                                                                : Page::Offline);
+                        break;
+                }
             }
             else if (e.key.key == SDLK_UP)
                 selected_ = (selected_ + buttonCount_ - 1) % buttonCount_;
@@ -174,20 +216,27 @@ void MenuScreen::render() {
     drawRoundedRect(kWinW / 2.f + 6, 52, 28, 28, 7.f);
 
     centered("NervousGAME", 3.0f, 100, kText);
-    centered(page_ == Page::Main ? "Choisissez un mode de jeu"
-                                 : "Choisissez la difficulte",
-             1.5f, 148, kTextDim);
 
-     for (int i = 0; i < buttonCount_; ++i) {
+    const char* subtitle =
+        page_ == Page::Main      ? "Choisissez un mode de jeu" :
+        page_ == Page::Offline   ? "Jouer hors ligne" :
+        page_ == Page::Computer  ? "Choisissez la difficulte" :
+        page_ == Page::Online    ? "Heberger ou rejoindre" :
+                                   "Nouvelle partie ou reprise ?";
+    centered(subtitle, 1.5f, 148, kTextDim);
+
+    for (int i = 0; i < buttonCount_; ++i) {
         const Button& b = buttons_[i];
         const bool sel = (i == selected_);
-        const bool isBack = (b.mode == GameMode::None && !b.opensSubmenu);
+        const bool isBack = b.isBack;
+        const bool opensSubmenu = (b.goPage >= 0) && !isBack;
 
-        // Bleu : modes contre l'IA, rouge : modes a deux, gris : retour.
-        const bool vsAi = b.opensSubmenu ||
-                          b.mode == GameMode::VsComputerEasy ||
-                          b.mode == GameMode::VsComputerHard;
-        const Color accent = isBack ? kTextDim : (vsAi ? kP1 : kP2);
+        // Bleu : modes contre l'IA / hors ligne, rouge : modes a deux / reseau, gris : retour.
+        const bool blue = b.mode == GameMode::VsComputerEasy ||
+                          b.mode == GameMode::VsComputerHard ||
+                          b.goPage == static_cast<int>(Page::Computer) ||
+                          b.goPage == static_cast<int>(Page::Offline);
+        const Color accent = isBack ? kTextDim : (blue ? kP1 : kP2);
 
         setColor(renderer_, sel ? kPanelHi : kPanel);
         drawRoundedRect(b.x, b.y, b.w, b.h, isBack ? 12.f : 14.f);
@@ -201,7 +250,6 @@ void MenuScreen::render() {
         }
 
         if (isBack) {
-            // Texte centre (8 px de large par caractere, 8 px de haut, echelle 2).
             const float scale = 2.0f;
             const float tw = static_cast<float>(b.label.size()) * 8.f * scale;
             setColor(renderer_, sel ? kText : kTextDim);
@@ -215,8 +263,8 @@ void MenuScreen::render() {
             drawText(b.x + 28, b.y + 48, b.sub, 1.5f);
         }
 
-        // Petite fleche sur le bouton qui ouvre le sous-menu.
-        if (b.opensSubmenu) {
+        // Petite fleche sur les boutons qui ouvrent un sous-menu.
+        if (opensSubmenu) {
             setColor(renderer_, sel ? kText : kTextDim);
             drawText(b.x + b.w - 40, b.y + 26, ">", 3.0f);
         }

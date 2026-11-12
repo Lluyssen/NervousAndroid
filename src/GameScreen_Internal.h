@@ -28,7 +28,7 @@ inline constexpr Rgba kCard     {28, 32, 48, 255};
 inline constexpr Rgba kIllegal  {255, 80, 80, 140};
 
 // Mise en page HUD et temporisations IA
-inline constexpr float kHudHeight = 90.f;
+inline constexpr float kHudHeight = 120.f;
 inline constexpr float kCardY = 8.f;
 inline constexpr float kCardH = 66.f;
 inline constexpr float kMargin = 12.f;

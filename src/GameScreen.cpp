@@ -47,7 +47,9 @@ bool GameScreen::connectOnline(const std::string& host, int port) {
     host_ = host; port_ = port;
     net_ = std::make_unique<net::NetClient>();
     if (!net_->connectTo(host, port)) { net_.reset(); return false; }
-    mode_ = GameMode::Multiplayer;
+
+    // Le mode (Host ou Join) a deja ete fixe par setMode() / le constructeur.
+    // On ne l'ecrase plus : online() se base sur la presence de net_.
 
     // Attend le WELCOME (max ~5 s) pour connaitre joueur + taille de grille.
     const Uint64 t0 = SDL_GetTicks();
@@ -55,7 +57,8 @@ bool GameScreen::connectOnline(const std::string& host, int port) {
         if (auto m = net_->poll()) {
             if (m->type == net::MsgType::Welcome) {
                 myPlayer_ = m->you;
-                game_ = Game(m->width, m->height);
+                // Une partie chargee garde sa grille ; sinon on prend celle du serveur.
+                if (!resumed_) game_ = Game(m->width, m->height);
                 return true;
             }
         }

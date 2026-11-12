@@ -48,7 +48,9 @@ private:
     bool    opponentLeft_  = false;
     bool    connectionLost_ = false;
 
-    bool online() const { return mode_ == GameMode::Multiplayer; }
+    // En ligne = une connexion reseau existe (modes Host et Join).
+    // Apres un echec de connexion, net_ est remis a zero : online() devient faux.
+    bool online() const { return net_ != nullptr; }
     bool canAct() const;
     void pollNetwork();
     void sendClick(Pos p);
