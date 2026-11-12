@@ -373,6 +373,102 @@ src/GameScreen.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen.cpp.s
 .PHONY : src/GameScreen.cpp.s
 
+src/GameScreen_Draw.o: src/GameScreen_Draw.cpp.o
+.PHONY : src/GameScreen_Draw.o
+
+# target to build an object file
+src/GameScreen_Draw.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Draw.cpp.o
+.PHONY : src/GameScreen_Draw.cpp.o
+
+src/GameScreen_Draw.i: src/GameScreen_Draw.cpp.i
+.PHONY : src/GameScreen_Draw.i
+
+# target to preprocess a source file
+src/GameScreen_Draw.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Draw.cpp.i
+.PHONY : src/GameScreen_Draw.cpp.i
+
+src/GameScreen_Draw.s: src/GameScreen_Draw.cpp.s
+.PHONY : src/GameScreen_Draw.s
+
+# target to generate assembly for a file
+src/GameScreen_Draw.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Draw.cpp.s
+.PHONY : src/GameScreen_Draw.cpp.s
+
+src/GameScreen_Input.o: src/GameScreen_Input.cpp.o
+.PHONY : src/GameScreen_Input.o
+
+# target to build an object file
+src/GameScreen_Input.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Input.cpp.o
+.PHONY : src/GameScreen_Input.cpp.o
+
+src/GameScreen_Input.i: src/GameScreen_Input.cpp.i
+.PHONY : src/GameScreen_Input.i
+
+# target to preprocess a source file
+src/GameScreen_Input.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Input.cpp.i
+.PHONY : src/GameScreen_Input.cpp.i
+
+src/GameScreen_Input.s: src/GameScreen_Input.cpp.s
+.PHONY : src/GameScreen_Input.s
+
+# target to generate assembly for a file
+src/GameScreen_Input.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Input.cpp.s
+.PHONY : src/GameScreen_Input.cpp.s
+
+src/GameScreen_UI.o: src/GameScreen_UI.cpp.o
+.PHONY : src/GameScreen_UI.o
+
+# target to build an object file
+src/GameScreen_UI.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_UI.cpp.o
+.PHONY : src/GameScreen_UI.cpp.o
+
+src/GameScreen_UI.i: src/GameScreen_UI.cpp.i
+.PHONY : src/GameScreen_UI.i
+
+# target to preprocess a source file
+src/GameScreen_UI.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_UI.cpp.i
+.PHONY : src/GameScreen_UI.cpp.i
+
+src/GameScreen_UI.s: src/GameScreen_UI.cpp.s
+.PHONY : src/GameScreen_UI.s
+
+# target to generate assembly for a file
+src/GameScreen_UI.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_UI.cpp.s
+.PHONY : src/GameScreen_UI.cpp.s
+
+src/GameScreen_Update.o: src/GameScreen_Update.cpp.o
+.PHONY : src/GameScreen_Update.o
+
+# target to build an object file
+src/GameScreen_Update.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Update.cpp.o
+.PHONY : src/GameScreen_Update.cpp.o
+
+src/GameScreen_Update.i: src/GameScreen_Update.cpp.i
+.PHONY : src/GameScreen_Update.i
+
+# target to preprocess a source file
+src/GameScreen_Update.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Update.cpp.i
+.PHONY : src/GameScreen_Update.cpp.i
+
+src/GameScreen_Update.s: src/GameScreen_Update.cpp.s
+.PHONY : src/GameScreen_Update.s
+
+# target to generate assembly for a file
+src/GameScreen_Update.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nervous_game.dir/build.make CMakeFiles/nervous_game.dir/src/GameScreen_Update.cpp.s
+.PHONY : src/GameScreen_Update.cpp.s
+
 src/MenuScreen.o: src/MenuScreen.cpp.o
 .PHONY : src/MenuScreen.o
 
@@ -482,6 +578,18 @@ help:
 	@echo "... src/GameScreen.o"
 	@echo "... src/GameScreen.i"
 	@echo "... src/GameScreen.s"
+	@echo "... src/GameScreen_Draw.o"
+	@echo "... src/GameScreen_Draw.i"
+	@echo "... src/GameScreen_Draw.s"
+	@echo "... src/GameScreen_Input.o"
+	@echo "... src/GameScreen_Input.i"
+	@echo "... src/GameScreen_Input.s"
+	@echo "... src/GameScreen_UI.o"
+	@echo "... src/GameScreen_UI.i"
+	@echo "... src/GameScreen_UI.s"
+	@echo "... src/GameScreen_Update.o"
+	@echo "... src/GameScreen_Update.i"
+	@echo "... src/GameScreen_Update.s"
 	@echo "... src/MenuScreen.o"
 	@echo "... src/MenuScreen.i"
 	@echo "... src/MenuScreen.s"

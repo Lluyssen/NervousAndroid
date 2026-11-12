@@ -17,6 +17,7 @@ namespace ng {
 class GameScreen {
 public:
     GameScreen(int width, int height);
+    GameScreen(Game loaded, GameMode mode);   // reprise d'une partie sauvegardee
     ~GameScreen();
 
     GameScreen(const GameScreen&) = delete;
@@ -26,6 +27,7 @@ public:
     void run();
     void setMode(GameMode m);
     bool connectOnline(const std::string& host, int port);
+    bool wantsMenu() const { return wantsMenu_; }
 
 private:
     enum class AiLevel { Easy, Hard };
@@ -119,12 +121,26 @@ private:
     std::string playerName(Player pl) const;
     void drawMessageToast();
 
+    // --- Reconnexion reseau ---
     std::string host_;
-int         port_ = 0;
-Uint64      nextRetryTicks_ = 0;
-int         retryCount_ = 0;
-bool        replaying_ = false;
-void tryReconnect();
+    int         port_ = 0;
+    Uint64      nextRetryTicks_ = 0;
+    int         retryCount_ = 0;
+    bool        replaying_ = false;
+    void tryReconnect();
+
+    // --- Reprise de partie + pause ---
+    bool   resumed_       = false;      // partie chargee depuis une sauvegarde
+    bool   paused_        = false;
+    bool   wantsMenu_     = false;      // lu par main.cpp pour revenir au menu
+    int    pauseHover_    = -1;
+    Uint64 savedMsgUntil_ = 0;          // affichage "Partie sauvegardee"
+
+    struct PauseButton { float x, y, w, h; const char* label; };
+    PauseButton pauseButton(int i) const;   // 0 = Sauvegarder, 1 = Retour Menu
+    int  pauseButtonAt(float mx, float my) const;
+    void drawPauseMenu();
+    void handlePauseClick(float mx, float my);
 };
 
 }  // namespace ng

@@ -31,6 +31,10 @@ find_package(SDL3 REQUIRED)
 add_executable(nervous_game
         src/main.cpp
         src/GameScreen.cpp
+        src/GameScreen_Update.cpp
+        src/GameScreen_Draw.cpp
+        src/GameScreen_Input.cpp
+        src/GameScreen_UI.cpp
         src/MenuScreen.cpp
 )
 target_include_directories(nervous_game PRIVATE src)

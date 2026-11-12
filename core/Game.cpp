@@ -1,7 +1,85 @@
 #include "Game.h"
 #include <stdexcept>
+#include <fstream>
 
 namespace ng {
+
+// ---------------------------------------------------------------------------
+// Sauvegarde / chargement
+// ---------------------------------------------------------------------------
+
+bool Game::saveToFile(const std::string& path, int mode) const {
+    std::ofstream f(path);
+    if (!f) return false;
+
+    f << "NERVOUS_SAVE 1\n";
+    f << "mode " << mode << "\n";
+    f << "size " << board_.width() << " " << board_.height() << "\n";
+    f << "phase " << static_cast<int>(phase_) << "\n";
+    f << "current " << static_cast<int>(current_) << "\n";
+    f << "relocating " << static_cast<int>(relocating_) << "\n";
+    f << "hp " << hp_[0] << " " << hp_[1] << "\n";
+    f << "placed " << placed_ << "\n";
+    f << "winner " << (winner_.has_value() ? static_cast<int>(*winner_) : -1) << "\n";
+    f << "cells\n";
+    for (int y = 0; y < board_.height(); ++y) {
+        for (int x = 0; x < board_.width(); ++x)
+            f << static_cast<int>(board_.get(x, y)) << ' ';
+        f << '\n';
+    }
+    return static_cast<bool>(f);
+}
+
+std::optional<Game> Game::loadFromFile(const std::string& path, int* modeOut) {
+    std::ifstream f(path);
+    if (!f) return std::nullopt;
+
+    std::string tag, key;
+    int version = 0, mode = 0, w = 0, h = 0;
+    int phase = 0, cur = 0, reloc = 0, hp0 = 0, hp1 = 0, placed = 0, win = -1;
+
+    if (!(f >> tag >> version) || tag != "NERVOUS_SAVE" || version != 1) return std::nullopt;
+    if (!(f >> key >> mode)             || key != "mode")       return std::nullopt;
+    if (!(f >> key >> w >> h)           || key != "size")       return std::nullopt;
+    if (!(f >> key >> phase)            || key != "phase")      return std::nullopt;
+    if (!(f >> key >> cur)              || key != "current")    return std::nullopt;
+    if (!(f >> key >> reloc)            || key != "relocating") return std::nullopt;
+    if (!(f >> key >> hp0 >> hp1)       || key != "hp")         return std::nullopt;
+    if (!(f >> key >> placed)           || key != "placed")     return std::nullopt;
+    if (!(f >> key >> win)              || key != "winner")     return std::nullopt;
+    if (!(f >> key)                     || key != "cells")      return std::nullopt;
+
+    if (phase < 0 || phase > static_cast<int>(Phase::GameOver)) return std::nullopt;
+    if (cur < 0 || cur > 1 || reloc < 0 || reloc > 1)           return std::nullopt;
+
+    try {
+        Game g(w, h);   // valide la taille (15..100)
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x) {
+                int c = 0;
+                if (!(f >> c) || c < 0 || c > static_cast<int>(Cell::Base2))
+                    return std::nullopt;
+                g.board_.set(x, y, static_cast<Cell>(c));
+            }
+
+        g.phase_      = static_cast<Phase>(phase);
+        g.current_    = static_cast<Player>(cur);
+        g.relocating_ = static_cast<Player>(reloc);
+        g.hp_[0]      = hp0;
+        g.hp_[1]      = hp1;
+        g.placed_     = placed;
+        if (win == 0 || win == 1) g.winner_ = static_cast<Player>(win);
+
+        if (modeOut) *modeOut = mode;
+        return g;
+    } catch (const std::exception&) {
+        return std::nullopt;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
 
 std::string describe(Result r) {
     switch (r) {
@@ -26,6 +104,10 @@ std::string describe(Result r) {
     return "";
 }
 
+// ---------------------------------------------------------------------------
+// Construction / fin de partie
+// ---------------------------------------------------------------------------
+
 Game::Game(int width, int height) : board_(width, height) {
     if (width < rules::kMinGrid || width > rules::kMaxGrid ||
         height < rules::kMinGrid || height > rules::kMaxGrid)
@@ -41,6 +123,10 @@ bool Game::baseWouldBeReachable(const Board& candidate, Player p) const {
     return rules::baseIsMutuallyReachable(candidate, p);
 }
 
+// ---------------------------------------------------------------------------
+// Aides pour l'interface
+// ---------------------------------------------------------------------------
+
 std::vector<Pos> Game::legalSquarePlacementsFor(Player p) const {
     std::vector<Pos> out;
     for (int y = 0; y < board_.height(); ++y)
@@ -49,6 +135,16 @@ std::vector<Pos> Game::legalSquarePlacementsFor(Player p) const {
             if (rules::canPlaceSquare(board_, p, c, nullptr)) out.push_back(c);
         }
     return out;
+}
+
+std::vector<Pos> Game::legalSquarePlacements() const {
+    if (phase_ != Phase::PlaySquares) return {};
+    return legalSquarePlacementsFor(current_);
+}
+
+std::vector<Pos> Game::legalBaseRelocations() const {
+    if (phase_ != Phase::RelocateBase) return {};
+    return rules::legalRelocations(board_, relocating_);
 }
 
 std::vector<Pos> Game::legalInitialBasePlacements() const {
@@ -71,6 +167,10 @@ std::vector<Pos> Game::legalInitialBasePlacements() const {
         }
     return out;
 }
+
+// ---------------------------------------------------------------------------
+// Actions
+// ---------------------------------------------------------------------------
 
 Result Game::placeBase(Pos tl) {
     if (isOver()) return Result::GameOver;
@@ -102,17 +202,6 @@ Result Game::placeBase(Pos tl) {
     return Result::Ok;
 }
 
-std::vector<Pos> Game::legalSquarePlacements() const {
-    std::vector<Pos> out;
-    if (phase_ != Phase::PlaySquares) return out;
-    return legalSquarePlacementsFor(current_);
-}
-
-std::vector<Pos> Game::legalBaseRelocations() const {
-    if (phase_ != Phase::RelocateBase) return {};
-    return rules::legalRelocations(board_, relocating_);
-}
-
 Result Game::placeSquare(Pos pos) {
     if (isOver()) return Result::GameOver;
     if (phase_ == Phase::RelocateBase) return Result::MustRelocateBase;
@@ -139,38 +228,6 @@ Result Game::placeSquare(Pos pos) {
 
     afterPlacementChecks();
     return Result::Ok;
-}
-
-void Game::checkEnclosures() {
-    // E1 : vérification après chaque pose, pour les deux bases.
-    // Une base doit être déplacée si elle est enfermée OU non mutuellement accessible.
-    Player order[2] = {current_, opponent(current_)};
-    for (Player p : order) {
-        bool mustMove = rules::isEnclosed(board_, p)
-                     || !rules::baseIsMutuallyReachable(board_, p);
-        if (!mustMove) continue;
-
-        if (rules::legalRelocations(board_, p).empty()) {
-            // Aucune position légale : le propriétaire perd (F4 / R44).
-            finish(opponent(p));
-            return;
-        }
-        relocating_ = p;
-        phase_ = Phase::RelocateBase;
-        return;
-    }
-}
-
-void Game::afterPlacementChecks() {
-    checkEnclosures();
-    if (isOver() || phase_ == Phase::RelocateBase) return;
-
-    // R49/F : si le joueur courant a posé ses 2 carrés, le tour passe.
-    if (placed_ >= 2) {
-        current_ = opponent(current_);
-        placed_ = 0;
-        if (!rules::hasAnyLegalPlacement(board_, current_)) finish(opponent(current_));
-    }
 }
 
 Result Game::endTurn() {
@@ -223,6 +280,42 @@ Result Game::relocateBase(Pos tl) {
             finish(opponent(current_));
     }
     return Result::Ok;
+}
+
+// Logique interne
+void Game::checkEnclosures() {
+    // E1 : vérification après chaque pose, pour les deux bases.
+    // Une base doit être déplacée si l'adversaire ne peut plus l'atteindre.
+    Player order[2] = {current_, opponent(current_)};
+    for (Player p : order) {
+        // Pas de vérification tant que les deux bases ne sont pas posées.
+        if (!rules::findBase(board_, p, nullptr) ||
+            !rules::findBase(board_, opponent(p), nullptr))
+            continue;
+
+        if (!rules::isEnclosed(board_, p)) continue;
+
+        if (rules::legalRelocations(board_, p).empty()) {
+            // Aucune position légale : le propriétaire perd (F4 / R44).
+            finish(opponent(p));
+            return;
+        }
+        relocating_ = p;
+        phase_ = Phase::RelocateBase;
+        return;
+    }
+}
+
+void Game::afterPlacementChecks() {
+    checkEnclosures();
+    if (isOver() || phase_ == Phase::RelocateBase) return;
+
+    // R49/F : si le joueur courant a posé ses 2 carrés, le tour passe.
+    if (placed_ >= 2) {
+        current_ = opponent(current_);
+        placed_ = 0;
+        if (!rules::hasAnyLegalPlacement(board_, current_)) finish(opponent(current_));
+    }
 }
 
 }  // namespace ng

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <optional>
+#include <string>
 #include "Board.h"
 #include "Rules.h"
 #include "Types.h"
@@ -55,12 +56,17 @@ public:
     std::vector<Pos> legalBaseRelocations() const;
     // Placements légaux de la base du joueur courant en phase de mise en place.
     std::vector<Pos> legalInitialBasePlacements() const;
-
     bool baseWouldBeReachable(const Board& candidate, Player p) const;
     std::vector<Pos> legalSquarePlacementsFor(Player p) const;
     Player winnerOrDefault() const { return winner_.value_or(Player::One); }
 
     Player actingPlayer() const { return phase_ == Phase::RelocateBase ? relocating_ : current_; }
+
+    // --- Sauvegarde / reprise ---
+    // mode = valeur entière de GameMode, stockée pour la reprise.
+    bool saveToFile(const std::string& path, int mode) const;
+    // modeOut (optionnel) reçoit le mode sauvegardé.
+    static std::optional<Game> loadFromFile(const std::string& path, int* modeOut);
 
 private:
     void afterPlacementChecks();   // dégâts déjà appliqués ; vérifie enfermement + blocage

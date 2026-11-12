@@ -1,6 +1,7 @@
 #include "MenuScreen.h"
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 
 namespace ng {
 
@@ -47,16 +48,21 @@ void MenuScreen::showPage(Page p) {
     float y = 190.f;
 
     if (p == Page::Main) {
-        buttons_[0] = {x, y, bw, bh, "Ordinateur", "Jouer contre l'IA",
-                       GameMode::None, true};
+    buttonCount_ = 0;
+    if (std::ifstream("save.txt").good()) {
+        buttons_[buttonCount_++] = {x, y, bw, bh, "Continuer", "Reprendre la partie",
+                                    GameMode::LoadSave, false};
         y += bh + gap;
-        buttons_[1] = {x, y, bw, bh, "1 contre 1", "Deux joueurs, meme ecran",
-                       GameMode::LocalOneVsOne, false};
-        y += bh + gap;
-        buttons_[2] = {x, y, bw, bh, "Multijoueur", "Jouer en reseau",
-                       GameMode::Multiplayer, false};
-        buttonCount_ = 3;
-    } else {
+    }
+    buttons_[buttonCount_++] = {x, y, bw, bh, "Ordinateur", "Jouer contre l'IA",
+                                GameMode::None, true};
+    y += bh + gap;
+    buttons_[buttonCount_++] = {x, y, bw, bh, "1 contre 1", "Deux joueurs, meme ecran",
+                                GameMode::LocalOneVsOne, false};
+    y += bh + gap;
+    buttons_[buttonCount_++] = {x, y, bw, bh, "Multijoueur", "Jouer en reseau",
+                                GameMode::Multiplayer, false};
+} else {
         buttons_[0] = {x, y, bw, bh, "Ordinateur simplet", "IA facile",
                        GameMode::VsComputerEasy, false};
         y += bh + gap;

@@ -4,13 +4,7 @@
 
 namespace ng {
 
-enum class GameMode {
-    None,
-    VsComputerEasy,
-    VsComputerHard,
-    LocalOneVsOne,
-    Multiplayer
-};
+enum class GameMode { None, VsComputerEasy, VsComputerHard, LocalOneVsOne, Multiplayer, LoadSave };
 
 class MenuScreen {
 public:

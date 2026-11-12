@@ -148,58 +148,67 @@ bool isEnclosed(const Board& b, Player p) {
 
 bool floodReaches(const Board& b, Player from, Player target) {
     const int W = b.width(), H = b.height();
-    std::vector<char> seen(static_cast<size_t>(W) * H, 0);
-    std::vector<Pos> stack;
 
+    // Cases vides touchant la base cible.
+    std::vector<char> goal(static_cast<size_t>(W) * H, 0);
+    bool anyGoal = false;
+    for (int y = 0; y < H; ++y)
+        for (int x = 0; x < W; ++x) {
+            if (!b.isEmpty(x, y)) continue;
+            for (int dy = -1; dy <= 1 && !goal[y * W + x]; ++dy)
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0) continue;
+                    int nx = x + dx, ny = y + dy;
+                    if (b.inBounds(nx, ny) && b.get(nx, ny) == baseOf(target)) {
+                        goal[y * W + x] = 1;
+                        anyGoal = true;
+                        break;
+                    }
+                }
+        }
+    if (!anyGoal) return false;
+
+    Board sim = b;
+    std::vector<char> queued(static_cast<size_t>(W) * H, 0);
+    std::vector<Pos> work;
+
+    auto push = [&](int x, int y) {
+        if (!sim.inBounds(x, y) || queued[y * W + x]) return;
+        if (!sim.isEmpty(x, y)) return;
+        queued[y * W + x] = 1;
+        work.push_back(Pos{x, y});
+    };
+
+    // Graine : voisins (distance 1 et 2) de chaque case de 'from'.
+    auto pushAround = [&](int x, int y) {
+        for (int d = 0; d < 4; ++d) {
+            push(x + DX4[d],     y + DY4[d]);
+            push(x + 2 * DX4[d], y + 2 * DY4[d]);
+        }
+    };
     for (int y = 0; y < H; ++y)
         for (int x = 0; x < W; ++x)
-            if (b.get(x, y) == baseOf(from)) {
-                seen[y * W + x] = 1;
-                stack.push_back(Pos{x, y});
-            }
+            if (sim.isOwnedBy(x, y, from)) pushAround(x, y);
 
-    while (!stack.empty()) {
-        Pos p = stack.back();
-        stack.pop_back();
+    while (!work.empty()) {
+        Pos p = work.back();
+        work.pop_back();
+        queued[p.y * W + p.x] = 0;          // pourra être requeue si besoin
 
-        // Contact côté ou coin avec la base cible.
-        for (int dy = -1; dy <= 1; ++dy)
-            for (int dx = -1; dx <= 1; ++dx) {
-                if (dx == 0 && dy == 0) continue;
-                int tx = p.x + dx, ty = p.y + dy;
-                if (b.inBounds(tx, ty) && b.get(tx, ty) == baseOf(target)) return true;
-            }
+        if (!sim.isEmpty(p.x, p.y)) continue;
+        if (!canPlaceSquare(sim, from, p, nullptr)) continue;
+        if (goal[p.y * W + p.x]) return true;
 
-        for (int d = 0; d < 4; ++d) {
-            int nx = p.x + DX4[d], ny = p.y + DY4[d];
-            if (!b.inBounds(nx, ny) || seen[ny * W + nx]) continue;
-            Cell c = b.get(nx, ny);
-            if (c == Cell::Empty || c == squareOf(from)) {
-                seen[ny * W + nx] = 1;
-                stack.push_back(Pos{nx, ny});
-                continue;
-            }
-            // Traversée : un carré adverse d'épaisseur 1 peut être franchi
-            // si la case derrière n'est pas un autre carré adverse (R53).
-            if (c == squareOf(target)) {
-                int fx = nx + DX4[d], fy = ny + DY4[d];
-                if (b.inBounds(fx, fy) &&
-                    (b.get(fx, fy) == Cell::Empty || b.get(fx, fy) == squareOf(from)) &&
-                    !seen[fy * W + fx]) {
-                    seen[ny * W + nx] = 1;
-                    seen[fy * W + fx] = 1;
-                    stack.push_back(Pos{fx, fy});
-                }
-            }
-        }
+        sim.set(p.x, p.y, squareOf(from));
+        pushAround(p.x, p.y);               // seules ces cases peuvent changer
     }
     return false;
 }
 
 bool baseIsMutuallyReachable(const Board& b, Player p) {
     Pos other;
-    if (!findBase(b, opponent(p), &other)) return true;   // pas encore de base adverse
-    return floodReaches(b, opponent(p), p) && floodReaches(b, p, opponent(p));
+    if (!findBase(b, opponent(p), &other)) return true;
+    return floodReaches(b, opponent(p), p);
 }
 
 std::vector<Pos> legalRelocations(const Board& b, Player p) {
